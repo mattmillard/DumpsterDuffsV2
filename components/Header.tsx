@@ -9,13 +9,13 @@ export default function Header() {
   return (
     <header className="bg-[#1A1A1A] shadow-lg sticky top-0 z-50 border-b border-[#404040]">
       <div className="container-custom">
-        <div className="flex items-center justify-between h-20">
+        <div className="flex items-center justify-between h-56">
           {/* Logo */}
           <Link
             href="/"
             className="flex items-center hover:opacity-80 transition-opacity"
           >
-            <img src="/logo-horizontal.png" alt="Dumpster Duff's" className="h-16 w-auto" />
+            <img src="/logo-horizontal.png" alt="Dumpster Duff's" className="h-48 w-auto" />
           </Link>
 
           {/* Desktop Navigation */}
