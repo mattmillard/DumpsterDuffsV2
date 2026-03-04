@@ -16,7 +16,7 @@ export default function Header() {
             className="flex items-center gap-3 hover:opacity-80 transition-opacity"
           >
             <img
-              src="/logo-badge.png"
+              src="/logo.png"
               alt="Dumpster Duff's"
               className="w-12 h-12"
             />

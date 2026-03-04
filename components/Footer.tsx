@@ -10,7 +10,7 @@ export default function Footer() {
           <div>
             <div className="flex items-center gap-3 mb-4">
               <img
-                src="/logo-badge.png"
+                src="/logo.png"
                 alt="Dumpster Duff's"
                 className="w-10 h-10"
               />
