@@ -1,4 +1,5 @@
 import Hero from "@/components/home/Hero";
+import DualServiceShowcase from "@/components/home/DualServiceShowcase";
 import InstantQuote from "@/components/home/InstantQuote";
 import SizeOverview from "@/components/home/SizeOverview";
 import WhyChooseUs from "@/components/home/WhyChooseUs";
@@ -12,6 +13,7 @@ export default function Home() {
   return (
     <>
       <Hero />
+      <DualServiceShowcase />
       <InstantQuote />
       <SizeOverview />
       <WhyChooseUs />

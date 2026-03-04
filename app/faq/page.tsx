@@ -3,7 +3,7 @@ import { Metadata } from "next";
 export const metadata: Metadata = {
   title: "FAQ | Dumpster Duff's",
   description:
-    "Frequently asked questions about dumpster rental in Missouri. Find answers to your dumpster rental questions.",
+    "FAQs about dumpster rental and professional junk removal in Missouri. Find answers to your questions.",
 };
 
 export default function FAQ() {
@@ -72,6 +72,52 @@ export default function FAQ() {
       ],
     },
     {
+      title: "Junk Removal Service",
+      faqs: [
+        {
+          q: "What is your professional junk removal service?",
+          a: "We offer full-service junk removal where our licensed, insured crews load, haul, and dispose of your items. Perfect for estate cleanouts, basement clearances, storm debris, and bulk hauling. You don't lift a finger!",
+        },
+        {
+          q: "How does junk removal pricing work?",
+          a: "Junk removal is priced based on volume and weight. Call (573) 356-4272 for a free quote, or describe what you need removed and we'll give you a price.",
+        },
+        {
+          q: "What can you remove?",
+          a: "We remove almost everything: furniture, appliances, yard waste, construction debris, e-waste, and more. We handle hazardous materials carefully and dispose of everything responsibly per local regulations.",
+        },
+        {
+          q: "How fast can you schedule removal?",
+          a: "Often the same or next day! Call us with your needs and we'll find the quickest available time slot.",
+        },
+        {
+          q: "Do you haul away items from multiple rooms?",
+          a: "Absolutely! We handle full house cleanouts, basement removals, multi-room projects, and more. The more you have, the better the per-item value.",
+        },
+      ],
+    },
+    {
+      title: "Dumpster vs. Junk Removal",
+      faqs: [
+        {
+          q: "Should I rent a dumpster or use junk removal?",
+          a: "Use dumpster rental if YOU'LL be loading (remodeling, landscaping, DIY projects). Use professional junk removal if you want US to handle everything (cleanouts, estates, bulk hauling). Many customers use both for different projects!",
+        },
+        {
+          q: "Can I compare costs?",
+          a: "Dumpsters are great for known quantities over time: $325 delivery + $5/day. Junk removal is project-based pricing—call us for a free quote on your specific job. Often they're similar in price, but removal saves time & effort.",
+        },
+        {
+          q: "What if I'm unsure which option is right?",
+          a: "Call us! We'll ask about your project, volume, and timeline, then recommend the best (and most cost-effective) solution. No pressure, just honest guidance. (573) 356-4272",
+        },
+        {
+          q: "Can you remove items from a rental dumpster?",
+          a: "Yes! If you want to rent a dumpster but need help loading it, ask about our professional loading service ($149).",
+        },
+      ],
+    },
+    {
       title: "General Questions",
       faqs: [
         {
@@ -79,20 +125,16 @@ export default function FAQ() {
           a: "If the dumpster is on your private property (driveway, yard), usually no permit is needed. If it's on the street or public property, check with your city—you may need a permit.",
         },
         {
-          q: "How long is the standard rental?",
-          a: "Standard rental is 7 days, but flexible periods are available. Extend it as long as you need.",
-        },
-        {
-          q: "What if I exceed the weight limit?",
-          a: "We include up to 2 tons. If you go over, overage fees apply ($50 per ton). We'll notify you before charging any overage.",
-        },
-        {
-          q: "Do you offer loading service?",
-          a: "Yes! Professional loading service is available for $149. Our team will load your dumpster for you.",
-        },
-        {
           q: "Are you a veteran-owned business?",
-          a: "Yes! We're proudly veteran-owned and committed to serving central Missouri with excellence.",
+          a: "Yes! We're proudly veteran-owned and licensed & insured. We're committed to serving central Missouri with excellence and integrity.",
+        },
+        {
+          q: "What areas do you serve?",
+          a: "We serve Columbia, Jefferson City, Fulton, Moberly, and surrounding central Missouri areas. Check our service areas page for details.",
+        },
+        {
+          q: "How do I stay updated on promotions?",
+          a: "Call us to get on our list for seasonal specials and volume discounts. Follow our social media for the latest offers!",
         },
       ],
     },
@@ -106,7 +148,7 @@ export default function FAQ() {
             Frequently Asked Questions
           </h1>
           <p className="text-xl text-white/70 mb-12">
-            Find answers to common questions about dumpster rental.
+            Find answers to all your questions about dumpster rental and junk removal services.
           </p>
 
           {/* FAQ Categories */}

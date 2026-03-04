@@ -7,27 +7,27 @@ export default function FAQTeaser() {
       schema: true,
     },
     {
+      question: "Should I rent a dumpster or use junk removal service?",
+      answer:
+        "Choose dumpster rental if you're doing the work yourself (remodeling, landscaping). Choose our junk removal service if you want us to handle everything (basement cleanout, estate sale). Most customers use dumpsters for projects and junk removal for bulk hauling. We help you decide!",
+      schema: true,
+    },
+    {
       question: "What size dumpster do I need for my project?",
       answer:
         "Our 15-yard dumpster is perfect for most residential projects including kitchen remodels, garage cleanouts, roofing jobs (up to 2,000 sq ft), and small deck removals. It holds about 4-5 pickup truck loads. Call us if you need help determining the right fit.",
       schema: true,
     },
     {
+      question: "Do you offer professional junk removal?",
+      answer:
+        "Yes! We have licensed, insured crews that handle estate cleanouts, basement removals, storm debris, and bulk hauling. We load, haul, and dispose—no lifting required. Call (573) 356-4272 for a free quote.",
+      schema: true,
+    },
+    {
       question: "How long can I keep the dumpster?",
       answer:
         "Standard rental is 7 days, but we offer flexible periods. Keep it as long as you need—just let us know. Need more time? We can extend your rental for a small daily fee.",
-      schema: true,
-    },
-    {
-      question: "What can't go in the dumpster?",
-      answer:
-        "We accept most household junk, construction debris, furniture, appliances, and yard waste. We CANNOT accept: hazardous materials, chemicals, paint, tires, batteries, or electronics. Call us if you're unsure about specific items.",
-      schema: true,
-    },
-    {
-      question: "Do I need a permit for a dumpster?",
-      answer:
-        "If the dumpster is placed on your private property (driveway, yard), usually no permit is needed. If it's on the street or public property, you may need a permit from your city. We can help guide you through the process.",
       schema: true,
     },
   ];

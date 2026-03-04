@@ -19,51 +19,58 @@ export default function Hero() {
               </span>
               <span className="trust-badge">🇺🇸 Veteran Owned</span>
               <span className="trust-badge">✓ Licensed & Insured</span>
+              <span className="trust-badge">🚚 Junk Removal Experts</span>
             </div>
 
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 text-balance">
-              Same-Day Dumpster Rental in{" "}
-              <span className="text-primary">Missouri</span>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 text-balance">
+              <span className="text-primary">Call Duff & Ditch Your Stuff</span>
             </h1>
-
-            <p className="text-xl md:text-2xl text-[#999999] mb-8 text-balance">
-              When you&apos;re ready to get rid of some junk and stuff, call
-              Duff! <strong>$325 delivery + $5/day</strong> with no hidden fees.
+            
+            <p className="text-lg md:text-xl text-[#999999] mb-8 text-balance">
+              Junk removal & dumpster rentals in Missouri. DIY or done-for-you—we handle it your way.
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-4 mb-8">
-              <a href="#book-now" className="btn-primary text-center">
-                <svg
-                  className="w-6 h-6 mr-2"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                  />
-                </svg>
-                Book Your Dumpster Now
-              </a>
-              <a href="tel:+15733564272" className="btn-secondary text-center">
-                <svg
-                  className="w-6 h-6 mr-2"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
-                  />
-                </svg>
-                (573) 356-4272
-              </a>
+            <div className="flex flex-col sm:flex-row gap-4 mb-12">
+              <div>
+                <p className="text-sm text-[#808080] mb-2">🛒 DIY Junk Removal</p>
+                <a href="#book-now" className="btn-primary text-center block">
+                  <svg
+                    className="w-6 h-6 mr-2 inline"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                    />
+                  </svg>
+                  Rent a Dumpster
+                </a>
+                <p className="text-xs text-[#666666] mt-2">From $325 delivery + $5/day</p>
+              </div>
+              <div>
+                <p className="text-sm text-[#808080] mb-2">👷 Professional Removal</p>
+                <a href="tel:+15733564272" className="btn-secondary text-center block">
+                  <svg
+                    className="w-6 h-6 mr-2 inline"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
+                    />
+                  </svg>
+                  Call for Quote
+                </a>
+                <p className="text-xs text-[#666666] mt-2">We handle it all</p>
+              </div>
             </div>
 
             {/* Value Props */}
