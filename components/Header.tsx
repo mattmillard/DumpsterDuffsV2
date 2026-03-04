@@ -13,17 +13,9 @@ export default function Header() {
           {/* Logo */}
           <Link
             href="/"
-            className="flex items-center gap-3 hover:opacity-80 transition-opacity"
+            className="flex items-center hover:opacity-80 transition-opacity"
           >
-            <img src="/logo.png" alt="Dumpster Duff's" className="w-12 h-12" />
-            <div className="flex flex-col">
-              <span className="font-bold text-xl text-primary leading-none">
-                Dumpster Duff&apos;s
-              </span>
-              <span className="text-xs text-primary/70 leading-none mt-0.5">
-                Veteran Owned
-              </span>
-            </div>
+            <img src="/logo-horizontal.png" alt="Dumpster Duff's" className="h-16 w-auto" />
           </Link>
 
           {/* Desktop Navigation */}

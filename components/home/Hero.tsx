@@ -127,7 +127,7 @@ export default function Hero() {
           <div className="order-1 lg:order-2">
             <div className="relative">
               <img
-                src="https://images.unsplash.com/photo-1566228015668-4c45dbc4e2f5?w=800&h=600&fit=crop"
+                src="https://dumpsterduffs.com/wp-content/uploads/2025/03/img-g8J0QQnyl9sQTvMJB6xJQ-3.jpeg"
                 alt="Professional dumpster delivery on residential driveway"
                 className="rounded-2xl shadow-2xl w-full h-auto"
               />
