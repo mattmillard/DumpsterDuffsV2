@@ -9,12 +9,10 @@ export default function Footer() {
           {/* Company Info */}
           <div>
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-lg">DD</span>
-              </div>
-              <span className="font-bold text-xl">Dumpster Duff&apos;s</span>
+              <img src="/logo-badge.svg" alt="Dumpster Duff's" className="w-10 h-10" />
+              <span className="font-bold text-xl text-primary">Dumpster Duff&apos;s</span>
             </div>
-            <p className="text-gray-300 text-sm mb-4">
+            <p className="text-white/60 text-sm mb-4">
               Veteran-owned dumpster rental serving Missouri communities with
               pride since 2020.
             </p>
@@ -27,8 +25,8 @@ export default function Footer() {
 
           {/* Quick Links */}
           <div>
-            <h4 className="font-bold text-lg mb-4">Quick Links</h4>
-            <ul className="space-y-2 text-gray-300">
+            <h4 className="font-bold text-lg mb-4 text-primary">Quick Links</h4>
+            <ul className="space-y-2 text-white/70 hover:text-white transition-colors">
               <li>
                 <Link
                   href="/sizes-pricing"
@@ -82,8 +80,8 @@ export default function Footer() {
 
           {/* Services */}
           <div>
-            <h4 className="font-bold text-lg mb-4">Our Services</h4>
-            <ul className="space-y-2 text-gray-300">
+            <h4 className="font-bold text-lg mb-4 text-primary">Our Services</h4>
+            <ul className="space-y-2 text-white/70">
               <li>15-Yard Dumpster Rental</li>
               <li>Same-Day Delivery</li>
               <li>Flexible Rental Periods</li>
@@ -95,8 +93,8 @@ export default function Footer() {
 
           {/* Contact */}
           <div>
-            <h4 className="font-bold text-lg mb-4">Contact Us</h4>
-            <ul className="space-y-3 text-gray-300">
+            <h4 className="font-bold text-lg mb-4 text-primary">Contact Us</h4>
+            <ul className="space-y-3 text-white/70">
               <li>
                 <a
                   href="tel:+15733564272"
@@ -164,7 +162,7 @@ export default function Footer() {
       {/* Bottom Bar */}
       <div className="border-t border-white/10">
         <div className="container-custom py-6">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-gray-400">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-white/50">
             <p>© 2026 Dumpster Duff&apos;s. All rights reserved.</p>
             <div className="flex gap-6">
               <Link
