@@ -5,8 +5,8 @@ const phoneRegex = /^[\d\s\-().+]*$/;
 const phoneSchema = z
   .string()
   .regex(phoneRegex, "Invalid phone number")
-  .transform((val) => val.replace(/\D/g, ""))
-  .refine((val) => val.length >= 10, "Phone number must be at least 10 digits");
+  .transform((val: string) => val.replace(/\D/g, ""))
+  .refine((val: string) => val.length >= 10, "Phone number must be at least 10 digits");
 
 // Size selection step
 export const sizeSelectionSchema = z.object({
