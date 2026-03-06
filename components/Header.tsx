@@ -64,7 +64,7 @@ export default function Header() {
             >
               (573) 356-4272
             </a>
-            <a href="#book-now" className="btn-primary">
+            <a href="/booking" className="btn-primary">
               Book Now
             </a>
           </div>
@@ -140,7 +140,7 @@ export default function Header() {
               >
                 (573) 356-4272
               </a>
-              <a href="#book-now" className="btn-primary mt-2">
+              <a href="/booking" className="btn-primary mt-2">
                 Book Now
               </a>
             </nav>

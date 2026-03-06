@@ -36,7 +36,7 @@ export default function Hero() {
                 <p className="text-sm text-[#808080] mb-2">
                   🛒 Rent a Dumpster
                 </p>
-                <a href="#book-now" className="btn-primary text-center block">
+                <a href="/booking" className="btn-primary text-center block">
                   <svg
                     className="w-6 h-6 mr-2 inline"
                     fill="none"

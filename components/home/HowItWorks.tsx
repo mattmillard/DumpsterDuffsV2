@@ -144,7 +144,7 @@ export default function HowItWorks() {
             questions.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a href="#book-now" className="btn-primary">
+            <a href="/booking" className="btn-primary">
               Book Your Dumpster
             </a>
             <a href="/faq" className="btn-secondary">

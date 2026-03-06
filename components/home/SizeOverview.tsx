@@ -139,7 +139,7 @@ export default function SizeOverview() {
                 </div>
 
                 {/* CTA */}
-                <a href="#book-now" className="btn-primary w-full text-center">
+                <a href="/booking" className="btn-primary w-full text-center">
                   Book This Size
                 </a>
               </div>

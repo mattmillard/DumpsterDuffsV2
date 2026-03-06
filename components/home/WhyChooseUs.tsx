@@ -182,7 +182,7 @@ export default function WhyChooseUs() {
                   </strong>
                 </p>
               </div>
-              <a href="#book-now" className="btn-accent whitespace-nowrap">
+              <a href="/booking" className="btn-accent whitespace-nowrap">
                 Request Loading Service
               </a>
             </div>

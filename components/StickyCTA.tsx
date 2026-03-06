@@ -40,7 +40,7 @@ export function StickyCTA() {
             </svg>
             Call Now
           </a>
-          <a href="#book-now" className="flex-1 btn-primary min-h-[48px]">
+          <a href="/booking" className="flex-1 btn-primary min-h-[48px]">
             Book Now
           </a>
         </div>

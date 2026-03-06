@@ -110,7 +110,7 @@ export default function DualServiceShowcase() {
               </p>
             </div>
 
-            <a href="#book-now" className="btn-primary w-full text-center">
+            <a href="/booking" className="btn-primary w-full text-center">
               Book Your Dumpster
             </a>
           </div>

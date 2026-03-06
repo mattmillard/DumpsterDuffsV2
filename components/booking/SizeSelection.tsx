@@ -1,0 +1,119 @@
+"use client";
+
+import { DumpsterSizeOption } from "@/types/booking";
+
+interface SizeCardProps {
+  size: DumpsterSizeOption;
+  isSelected: boolean;
+  onSelect: (sizeId: string) => void;
+}
+
+export function SizeCard({ size, isSelected, onSelect }: SizeCardProps) {
+  return (
+    <div
+      onClick={() => onSelect(size.id)}
+      className={`p-6 rounded-lg cursor-pointer transition-all duration-200 border-2 ${
+        isSelected
+          ? "border-primary bg-primary/10 shadow-lg"
+          : "border-[#404040] bg-[#1A1A1A] hover:border-primary/50 hover:shadow-md"
+      }`}
+    >
+      {/* Header */}
+      <div className="flex items-start justify-between mb-4">
+        <div>
+          <h3 className="text-2xl font-bold text-white mb-1">{size.name}</h3>
+          <p className="text-sm text-[#999999]">{size.description}</p>
+        </div>
+        {isSelected && (
+          <div className="flex-shrink-0 w-6 h-6 rounded-full bg-primary flex items-center justify-center">
+            <svg
+              className="w-4 h-4 text-white"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+            >
+              <path
+                fillRule="evenodd"
+                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                clipRule="evenodd"
+              />
+            </svg>
+          </div>
+        )}
+      </div>
+
+      {/* Dimensions */}
+      <div className="mb-4 pb-4 border-b border-[#404040]">
+        <p className="text-xs font-semibold text-[#999999] uppercase mb-2">
+          Dimensions
+        </p>
+        <p className="text-sm text-white font-mono">
+          {size.dimensions.length}' L × {size.dimensions.width}' W ×{" "}
+          {size.dimensions.height}' H
+        </p>
+      </div>
+
+      {/* Ideal for */}
+      <div className="mb-6">
+        <p className="text-xs font-semibold text-[#999999] uppercase mb-2">
+          Ideal For
+        </p>
+        <ul className="space-y-1">
+          {size.ideal_for.slice(0, 3).map((item, idx) => (
+            <li key={idx} className="text-sm text-white flex items-start">
+              <span className="text-primary mr-2">•</span>
+              {item}
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      {/* Pricing */}
+      <div className="bg-primary/10 rounded-lg p-4 border border-primary/30">
+        <p className="text-xs text-[#999999] mb-1">Starting at</p>
+        <p className="text-2xl font-bold text-primary">
+          ${size.price_base.toFixed(2)}
+        </p>
+        <p className="text-xs text-[#999999] mt-2">
+          ${size.price_per_day.toFixed(2)}/day after 7-day rental
+        </p>
+      </div>
+    </div>
+  );
+}
+
+interface SizeSelectionProps {
+  sizes: DumpsterSizeOption[];
+  selectedSizeId?: string;
+  onSelect: (sizeId: string) => void;
+  isLoading?: boolean;
+}
+
+export function SizeSelection({
+  sizes,
+  selectedSizeId,
+  onSelect,
+  isLoading,
+}: SizeSelectionProps) {
+  if (isLoading) {
+    return (
+      <div className="grid md:grid-cols-2 gap-6">
+        {[...Array(4)].map((_, i) => (
+          <div key={i} className="h-80 bg-[#1A1A1A] rounded-lg animate-pulse" />
+        ))}
+      </div>
+    );
+  }
+
+  return (
+    <div className="grid md:grid-cols-2 gap-6">
+      {sizes.map((size) => (
+        <SizeCard
+          key={size.id}
+          size={size}
+          isSelected={selectedSizeId === size.id}
+          onSelect={onSelect}
+        />
+      ))}
+    </div>
+  );
+}

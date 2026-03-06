@@ -33,7 +33,7 @@ export default function FinalCTA() {
           {/* CTAs */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
             <a
-              href="#book-now"
+              href="/booking"
               className="btn bg-accent text-secondary hover:bg-accent-dark shadow-lg text-lg px-8"
             >
               <svg

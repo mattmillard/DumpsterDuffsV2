@@ -74,6 +74,21 @@ module.exports = {
       maxWidth: {
         container: "1280px",
       },
+      padding: {
+        "safe-top": "env(safe-area-inset-top)",
+        "safe-bottom": "env(safe-area-inset-bottom)",
+        "safe-left": "env(safe-area-inset-left)",
+        "safe-right": "env(safe-area-inset-right)",
+      },
+      margin: {
+        "safe-top": "env(safe-area-inset-top)",
+        "safe-bottom": "env(safe-area-inset-bottom)",
+        "safe-left": "env(safe-area-inset-left)",
+        "safe-right": "env(safe-area-inset-right)",
+      },
+      height: {
+        "screen-full": "100dvh", // Dynamic viewport height
+      },
     },
   },
   plugins: [],
