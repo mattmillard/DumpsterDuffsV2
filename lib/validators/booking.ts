@@ -18,7 +18,7 @@ export type SizeSelectionData = z.infer<typeof sizeSelectionSchema>;
 // Dates step
 export const datesSchema = z
   .object({
-    delivery_date: z.string().refine((val) => {
+    delivery_date: z.string().refine((val: string) => {
       const date = new Date(val);
       const today = new Date();
       today.setHours(0, 0, 0, 0);
@@ -30,7 +30,7 @@ export const datesSchema = z
       .min(1, "Rental duration must be at least 1 day")
       .max(365, "Rental duration cannot exceed 1 year"),
   })
-  .refine((data) => {
+  .refine((data: any) => {
     const delivery = new Date(data.delivery_date);
     const pickup = new Date(delivery);
     pickup.setDate(pickup.getDate() + data.rental_duration_days);
