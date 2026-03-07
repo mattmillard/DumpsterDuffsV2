@@ -28,7 +28,10 @@ export async function getCurrentAdminUser(): Promise<AdminUser | null> {
     }
 
     // Check if user has admin role and is active
-    if (!["admin", "owner", "dispatcher"].includes(admin.role) || !admin.is_active) {
+    if (
+      !["admin", "owner", "dispatcher"].includes(admin.role) ||
+      !admin.is_active
+    ) {
       return null; // Not an admin or inactive
     }
 
