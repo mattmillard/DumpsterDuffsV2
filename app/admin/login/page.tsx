@@ -1,21 +1,32 @@
 "use client";
 
+import { Suspense } from "react";
 import { FormEvent, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 
 export default function AdminLoginPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-[#0F0F0F]" aria-hidden="true" />
+      }
+    >
+      <AdminLoginForm />
+    </Suspense>
+  );
+}
+
+function AdminLoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError("");
-    setLoading(true);
 
     const formData = new FormData(e.currentTarget);
     const submittedEmail = (
@@ -25,13 +36,13 @@ export default function AdminLoginPage() {
 
     if (!submittedEmail || !submittedPassword) {
       setError("Please enter both email and password.");
-      setLoading(false);
       return;
     }
 
     try {
       const isValidDemoLogin =
-        submittedEmail === "admin@example.com" && submittedPassword === "password";
+        submittedEmail === "admin@example.com" &&
+        submittedPassword === "password";
 
       if (!isValidDemoLogin) {
         setError("Invalid credentials.");
@@ -51,8 +62,6 @@ export default function AdminLoginPage() {
     } catch (err) {
       setError("An unexpected error occurred. Please try again.");
       console.error("Login error:", err);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -94,7 +103,6 @@ export default function AdminLoginPage() {
                 placeholder="admin@dumpsterduffs.com"
                 className="input-field w-full"
                 required
-                disabled={loading}
               />
             </div>
 
@@ -115,7 +123,6 @@ export default function AdminLoginPage() {
                 placeholder="••••••••"
                 className="input-field w-full"
                 required
-                disabled={loading}
               />
             </div>
 
@@ -129,39 +136,11 @@ export default function AdminLoginPage() {
             {/* Submit button */}
             <button
               type="submit"
-              disabled={loading}
               className="btn-primary w-full font-semibold text-base"
             >
-              {loading ? (
-                <>
-                  <svg
-                    className="animate-spin -ml-1 mr-2 h-4 w-4 inline"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                  >
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                    ></circle>
-                    <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                    ></path>
-                  </svg>
-                  Signing in...
-                </>
-              ) : (
-                "Sign In"
-              )}
+              Sign In
             </button>
           </form>
-
         </div>
 
         {/* Demo credentials (remove in production) */}

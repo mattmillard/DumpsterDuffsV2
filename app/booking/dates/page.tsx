@@ -14,7 +14,7 @@ import {
   calculatePickupDate,
   calculatePriceEstimate,
 } from "@/lib/utils/pricing";
-import { MOCK_SIZES } from "@/app/booking/mock-data";
+import { DumpsterSizeOption } from "@/types/booking";
 
 const STEPS = [
   { name: "size", label: "Size" },
@@ -28,25 +28,39 @@ export default function BookingDatesPage() {
   const router = useRouter();
   const [deliveryDate, setDeliveryDate] = useState("");
   const [rentalDays, setRentalDays] = useState(3);
+  const [sizes, setSizes] = useState<DumpsterSizeOption[]>([]);
   const [selectedSizeId, setSelectedSizeId] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string>("");
 
   useEffect(() => {
-    // Load selected size from session
-    const sizeId = sessionStorage.getItem("booking_size_id") || "size-15";
-    const validSizeId = MOCK_SIZES.some((size) => size.id === sizeId)
-      ? sizeId
-      : "size-15";
-    sessionStorage.setItem("booking_size_id", validSizeId);
-    setSelectedSizeId(validSizeId);
+    async function loadSizesAndSelection() {
+      const response = await fetch("/api/public/sizes", { cache: "no-store" });
+      const data = (await response.json()) as DumpsterSizeOption[];
+      setSizes(data || []);
 
-    // Set minimum delivery date
-    const minDate = getMinimumDeliveryDate(1);
-    setDeliveryDate(minDate);
+      const defaultId = data[0]?.id || "";
+      const sizeId = sessionStorage.getItem("booking_size_id") || defaultId;
+      const validSizeId = data.some((size) => size.id === sizeId)
+        ? sizeId
+        : defaultId;
+
+      if (!validSizeId) {
+        setError("No active dumpster sizes are available.");
+        return;
+      }
+
+      sessionStorage.setItem("booking_size_id", validSizeId);
+      setSelectedSizeId(validSizeId);
+
+      const minDate = getMinimumDeliveryDate(1);
+      setDeliveryDate(minDate);
+    }
+
+    loadSizesAndSelection();
   }, [router]);
 
-  const selectedSize = MOCK_SIZES.find((s) => s.id === selectedSizeId);
+  const selectedSize = sizes.find((s) => s.id === selectedSizeId);
   const pickupDate = deliveryDate
     ? calculatePickupDate(deliveryDate, rentalDays)
     : "";

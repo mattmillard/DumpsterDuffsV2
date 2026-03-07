@@ -8,7 +8,7 @@ import {
 } from "@/components/booking/BookingProgressBar";
 import { SizeSelection } from "@/components/booking/SizeSelection";
 import { FormActions } from "@/components/booking/FormComponents";
-import { MOCK_SIZES } from "@/app/booking/mock-data";
+import { DumpsterSizeOption } from "@/types/booking";
 
 const STEPS = [
   { name: "size", label: "Size" },
@@ -20,16 +20,23 @@ const STEPS = [
 
 export default function BookingSizePage() {
   const router = useRouter();
-  const [selectedSizeId, setSelectedSizeId] = useState<string | undefined>(
-    MOCK_SIZES[0]?.id,
-  );
+  const [sizes, setSizes] = useState<DumpsterSizeOption[]>([]);
+  const [selectedSizeId, setSelectedSizeId] = useState<string | undefined>();
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    if (MOCK_SIZES.length === 1 && MOCK_SIZES[0]?.id) {
-      setSelectedSizeId(MOCK_SIZES[0].id);
-      sessionStorage.setItem("booking_size_id", MOCK_SIZES[0].id);
+    async function loadSizes() {
+      const response = await fetch("/api/public/sizes", { cache: "no-store" });
+      const data = (await response.json()) as DumpsterSizeOption[];
+      setSizes(data || []);
+
+      if (data.length > 0) {
+        setSelectedSizeId(data[0].id);
+        sessionStorage.setItem("booking_size_id", data[0].id);
+      }
     }
+
+    loadSizes();
   }, []);
 
   const handleSelectSize = (sizeId: string) => {
@@ -68,7 +75,7 @@ export default function BookingSizePage() {
 
       <div className="mb-8">
         <SizeSelection
-          sizes={MOCK_SIZES}
+          sizes={sizes}
           selectedSizeId={selectedSizeId}
           onSelect={handleSelectSize}
         />

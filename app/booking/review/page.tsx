@@ -11,12 +11,11 @@ import {
   PriceSummary,
 } from "@/components/booking/PriceSummary";
 import { FormActions } from "@/components/booking/FormComponents";
-import { MOCK_SIZES } from "@/app/booking/mock-data";
 import {
   calculatePriceEstimate,
   calculatePickupDate,
 } from "@/lib/utils/pricing";
-import { BookingFormData } from "@/types/booking";
+import { BookingFormData, DumpsterSizeOption } from "@/types/booking";
 
 const STEPS = [
   { name: "size", label: "Size" },
@@ -30,60 +29,70 @@ export default function BookingReviewPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [sizes, setSizes] = useState<DumpsterSizeOption[]>([]);
   const [bookingData, setBookingData] = useState<Partial<BookingFormData>>({});
 
   useEffect(() => {
-    // Load all session data
-    const sizeId = sessionStorage.getItem("booking_size_id");
-    if (!sizeId) {
-      router.push("/booking");
-      return;
+    async function loadReviewData() {
+      const response = await fetch("/api/public/sizes", { cache: "no-store" });
+      const liveSizes = (await response.json()) as DumpsterSizeOption[];
+      setSizes(liveSizes || []);
+
+      const sizeId = sessionStorage.getItem("booking_size_id");
+      if (!sizeId) {
+        router.push("/booking");
+        return;
+      }
+
+      const deliveryDate =
+        sessionStorage.getItem("booking_delivery_date") || "";
+      const rentalDays = parseInt(
+        sessionStorage.getItem("booking_rental_days") || "3",
+      );
+      const addressLine1 =
+        sessionStorage.getItem("booking_address_line1") || "";
+      const addressLine2 =
+        sessionStorage.getItem("booking_address_line2") || "";
+      const city = sessionStorage.getItem("booking_city") || "";
+      const state = sessionStorage.getItem("booking_state") || "MO";
+      const zip = sessionStorage.getItem("booking_zip") || "";
+      const fullName = sessionStorage.getItem("booking_full_name") || "";
+      const email = sessionStorage.getItem("booking_email") || "";
+      const phone = sessionStorage.getItem("booking_phone") || "";
+      const company = sessionStorage.getItem("booking_company") || "";
+      const notes = sessionStorage.getItem("booking_notes") || "";
+
+      const selectedSize = liveSizes.find((size) => size.id === sizeId);
+      const priceEstimate = selectedSize
+        ? calculatePriceEstimate(selectedSize, rentalDays)
+        : null;
+      const pickupDate = calculatePickupDate(deliveryDate, rentalDays);
+
+      const data: Partial<BookingFormData> = {
+        dumpster_size_id: sizeId,
+        delivery_date: deliveryDate,
+        pickup_date: pickupDate,
+        rental_duration_days: rentalDays,
+        delivery_address_line_1: addressLine1,
+        delivery_address_line_2: addressLine2,
+        delivery_city: city,
+        delivery_state: state,
+        delivery_zip: zip,
+        customer_full_name: fullName,
+        customer_email: email,
+        customer_phone: phone,
+        customer_company: company,
+        placement_notes: notes,
+        subtotal: priceEstimate?.subtotal || 0,
+        delivery_fee: priceEstimate?.delivery_fee || 0,
+        tax: priceEstimate?.tax || 0,
+        total: priceEstimate?.total || 0,
+      };
+
+      setBookingData(data);
     }
 
-    const deliveryDate = sessionStorage.getItem("booking_delivery_date") || "";
-    const rentalDays = parseInt(
-      sessionStorage.getItem("booking_rental_days") || "3",
-    );
-    const addressLine1 = sessionStorage.getItem("booking_address_line1") || "";
-    const addressLine2 = sessionStorage.getItem("booking_address_line2") || "";
-    const city = sessionStorage.getItem("booking_city") || "";
-    const state = sessionStorage.getItem("booking_state") || "MO";
-    const zip = sessionStorage.getItem("booking_zip") || "";
-    const fullName = sessionStorage.getItem("booking_full_name") || "";
-    const email = sessionStorage.getItem("booking_email") || "";
-    const phone = sessionStorage.getItem("booking_phone") || "";
-    const company = sessionStorage.getItem("booking_company") || "";
-    const notes = sessionStorage.getItem("booking_notes") || "";
-
-    // Get selected size and calculate pricing
-    const selectedSize = MOCK_SIZES.find((s) => s.id === sizeId);
-    const priceEstimate = selectedSize
-      ? calculatePriceEstimate(selectedSize, rentalDays)
-      : null;
-    const pickupDate = calculatePickupDate(deliveryDate, rentalDays);
-
-    const data: Partial<BookingFormData> = {
-      dumpster_size_id: sizeId,
-      delivery_date: deliveryDate,
-      pickup_date: pickupDate,
-      rental_duration_days: rentalDays,
-      delivery_address_line_1: addressLine1,
-      delivery_address_line_2: addressLine2,
-      delivery_city: city,
-      delivery_state: state,
-      delivery_zip: zip,
-      customer_full_name: fullName,
-      customer_email: email,
-      customer_phone: phone,
-      customer_company: company,
-      placement_notes: notes,
-      subtotal: priceEstimate?.subtotal || 0,
-      delivery_fee: priceEstimate?.delivery_fee || 0,
-      tax: priceEstimate?.tax || 0,
-      total: priceEstimate?.total || 0,
-    };
-
-    setBookingData(data);
+    loadReviewData();
   }, [router]);
 
   const handleBack = () => {
@@ -122,9 +131,7 @@ export default function BookingReviewPage() {
     }
   };
 
-  const selectedSize = MOCK_SIZES.find(
-    (s) => s.id === bookingData.dumpster_size_id,
-  );
+  const selectedSize = sizes.find((s) => s.id === bookingData.dumpster_size_id);
 
   return (
     <BookingContainer
