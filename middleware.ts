@@ -1,12 +1,12 @@
-import { type NextRequest, NextResponse } from 'next/server';
-import { createServerClient, type CookieOptions } from '@supabase/ssr';
+import { type NextRequest, NextResponse } from "next/server";
+import { createServerClient, type CookieOptions } from "@supabase/ssr";
 
 /**
  * Middleware for protecting admin routes and managing authentication
- * 
+ *
  * Protected routes:
  * - /admin/* (except /admin/login)
- * 
+ *
  * Public routes:
  * - /admin/login
  * - / (home page)
@@ -16,12 +16,12 @@ export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Allow login page without authentication
-  if (pathname === '/admin/login') {
+  if (pathname === "/admin/login") {
     return NextResponse.next();
   }
 
   // Protect admin routes
-  if (pathname.startsWith('/admin')) {
+  if (pathname.startsWith("/admin")) {
     try {
       // Create Supabase client for middleware
       let response = NextResponse.next({
@@ -62,7 +62,7 @@ export async function middleware(request: NextRequest) {
               });
             },
           },
-        }
+        },
       );
 
       // Get the current session
@@ -73,32 +73,32 @@ export async function middleware(request: NextRequest) {
       if (!session) {
         // No session found, redirect to login
         const url = request.nextUrl.clone();
-        url.pathname = '/admin/login';
-        url.searchParams.set('redirect', pathname);
+        url.pathname = "/admin/login";
+        url.searchParams.set("redirect", pathname);
         return NextResponse.redirect(url);
       }
 
       // Session exists, check user role for specific routes
       const { data: userData } = await supabase
-        .from('admin_users')
-        .select('role')
-        .eq('id', session.user.id)
+        .from("admin_users")
+        .select("role")
+        .eq("id", session.user.id)
         .single();
 
       // For now, allow all authenticated users to access admin
       // Implement role-based route protection here if needed
       if (!userData) {
         const url = request.nextUrl.clone();
-        url.pathname = '/admin/login';
+        url.pathname = "/admin/login";
         return NextResponse.redirect(url);
       }
 
       return response;
     } catch (error) {
-      console.error('Middleware error:', error);
+      console.error("Middleware error:", error);
       // On error, redirect to login for safety
       const url = request.nextUrl.clone();
-      url.pathname = '/admin/login';
+      url.pathname = "/admin/login";
       return NextResponse.redirect(url);
     }
   }
@@ -118,6 +118,6 @@ export const config = {
      * - favicon.ico (favicon file)
      * - public (public files)
      */
-    '/((?!api|_next/static|_next/image|favicon.ico|public).*)',
+    "/((?!api|_next/static|_next/image|favicon.ico|public).*)",
   ],
 };

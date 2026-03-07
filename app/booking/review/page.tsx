@@ -205,12 +205,13 @@ export default function BookingReviewPage() {
         )}
       </div>
 
-      <FormActions
-        onBack={handleBack}
-        nextDisabled={!selectedSize}
-        isLoading={isLoading}
-        className="mt-8"
-      />
+      <div className="mt-8">
+        <FormActions
+          onBack={handleBack}
+          nextDisabled={!selectedSize}
+          isLoading={isLoading}
+        />
+      </div>
     </BookingContainer>
   );
 }

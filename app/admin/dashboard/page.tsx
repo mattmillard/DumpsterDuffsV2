@@ -76,7 +76,11 @@ export default function AdminDashboard() {
   );
 
   const handleDismissAlert = (id: string) => {
-    setDismissedAlerts((prev) => new Set([...prev, id]));
+    setDismissedAlerts((prev) => {
+      const newSet = new Set(prev);
+      newSet.add(id);
+      return newSet;
+    });
   };
 
   const visibleAlerts = alerts.filter((a) => !dismissedAlerts.has(a.id));
