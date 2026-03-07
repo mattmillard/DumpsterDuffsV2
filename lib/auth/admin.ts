@@ -72,17 +72,46 @@ export async function adminLogin(
   password: string,
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
+    const normalizedEmail = email.trim().toLowerCase();
+
+    if (!normalizedEmail || !password) {
+      return {
+        success: false,
+        error: "Email and password are required.",
+      };
+    }
+
+    console.log("[adminLogin] Attempting login for:", normalizedEmail);
+
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: normalizedEmail,
       password,
     });
 
     if (error) {
+      console.error("[adminLogin] Supabase auth error:", {
+        message: error.message,
+        status: error.status,
+        name: error.name,
+      });
       return { success: false, error: error.message };
     }
 
+    const adminUser = await getCurrentAdminUser();
+
+    if (!adminUser) {
+      await supabase.auth.signOut();
+      return {
+        success: false,
+        error:
+          "Authenticated, but this account is not authorized for admin access. Add this user to admin_users.",
+      };
+    }
+
+    console.log("[adminLogin] Login successful for:", normalizedEmail);
     return { success: true };
   } catch (error) {
+    console.error("[adminLogin] Unexpected error:", error);
     return {
       success: false,
       error: "Login failed. Please try again.",

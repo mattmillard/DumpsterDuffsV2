@@ -5,7 +5,6 @@ import { useRouter, usePathname } from "next/navigation";
 import { AdminSidebar } from "@/components/admin/AdminSidebar";
 import { MobileHeader } from "@/components/admin-mobile/MobileHeader";
 import { MobileBottomNav } from "@/components/admin-mobile/MobileBottomNav";
-import { getCurrentAdminUser } from "@/lib/auth/admin";
 import { AdminUser } from "@/types/admin";
 
 export default function AdminLayout({
@@ -23,17 +22,24 @@ export default function AdminLayout({
   const isLoginPage = pathname === "/admin/login";
 
   useEffect(() => {
-    async function checkAuth() {
+    function checkAuth() {
       try {
-        const adminUser = await getCurrentAdminUser();
+        const isDemoAuthed = localStorage.getItem("admin_demo_auth") === "true";
 
-        if (!adminUser && !isLoginPage) {
-          router.push("/admin/login");
+        if (!isDemoAuthed && !isLoginPage) {
+          router.push(`/admin/login?redirect=${encodeURIComponent(pathname)}`);
           return;
         }
 
-        if (adminUser) {
-          setUser(adminUser);
+        if (isDemoAuthed) {
+          setUser({
+            id: "demo-admin",
+            email: "admin@example.com",
+            full_name: "Admin",
+            role: "owner",
+            is_active: true,
+            created_at: new Date().toISOString(),
+          });
         }
       } catch (err) {
         console.error("Auth error:", err);
@@ -47,7 +53,7 @@ export default function AdminLayout({
     }
 
     checkAuth();
-  }, [router, isLoginPage]);
+  }, [router, isLoginPage, pathname]);
 
   // For login page, render without auth layout
   if (isLoginPage) {

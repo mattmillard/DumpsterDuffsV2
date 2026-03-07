@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 interface MobileHeaderProps {
   title?: string;
@@ -20,7 +21,13 @@ export function MobileHeader({
   userRole = "Owner",
   onSettingsClick,
 }: MobileHeaderProps) {
+  const router = useRouter();
   const [showMenu, setShowMenu] = useState(false);
+
+  const handleSignOut = () => {
+    localStorage.removeItem("admin_demo_auth");
+    router.push("/admin/login");
+  };
 
   return (
     <>
@@ -70,8 +77,7 @@ export function MobileHeader({
               <button
                 onClick={() => {
                   setShowMenu(false);
-                  // Call logout function
-                  // adminLogout();
+                  handleSignOut();
                 }}
                 className="w-full text-left px-4 py-3 text-sm text-red-400 active:bg-[#262626] transition-colors font-medium"
               >

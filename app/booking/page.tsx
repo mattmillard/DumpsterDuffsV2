@@ -20,8 +20,17 @@ const STEPS = [
 
 export default function BookingSizePage() {
   const router = useRouter();
-  const [selectedSizeId, setSelectedSizeId] = useState<string | undefined>();
+  const [selectedSizeId, setSelectedSizeId] = useState<string | undefined>(
+    MOCK_SIZES[0]?.id,
+  );
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    if (MOCK_SIZES.length === 1 && MOCK_SIZES[0]?.id) {
+      setSelectedSizeId(MOCK_SIZES[0].id);
+      sessionStorage.setItem("booking_size_id", MOCK_SIZES[0].id);
+    }
+  }, []);
 
   const handleSelectSize = (sizeId: string) => {
     setSelectedSizeId(sizeId);

@@ -27,19 +27,19 @@ const STEPS = [
 export default function BookingDatesPage() {
   const router = useRouter();
   const [deliveryDate, setDeliveryDate] = useState("");
-  const [rentalDays, setRentalDays] = useState(7);
+  const [rentalDays, setRentalDays] = useState(3);
   const [selectedSizeId, setSelectedSizeId] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string>("");
 
   useEffect(() => {
     // Load selected size from session
-    const sizeId = sessionStorage.getItem("booking_size_id");
-    if (!sizeId) {
-      router.push("/booking");
-      return;
-    }
-    setSelectedSizeId(sizeId);
+    const sizeId = sessionStorage.getItem("booking_size_id") || "size-15";
+    const validSizeId = MOCK_SIZES.some((size) => size.id === sizeId)
+      ? sizeId
+      : "size-15";
+    sessionStorage.setItem("booking_size_id", validSizeId);
+    setSelectedSizeId(validSizeId);
 
     // Set minimum delivery date
     const minDate = getMinimumDeliveryDate(1);

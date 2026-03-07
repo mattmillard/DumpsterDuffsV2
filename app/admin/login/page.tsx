@@ -2,11 +2,11 @@
 
 import { FormEvent, useState } from "react";
 import Link from "next/link";
-import { adminLogin } from "@/lib/auth/admin";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function AdminLoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -17,16 +17,37 @@ export default function AdminLoginPage() {
     setError("");
     setLoading(true);
 
-    try {
-      const result = await adminLogin(email, password);
+    const formData = new FormData(e.currentTarget);
+    const submittedEmail = (
+      formData.get("email")?.toString().trim() || email.trim()
+    ).toLowerCase();
+    const submittedPassword = formData.get("password")?.toString() || password;
 
-      if (!result.success) {
-        setError(result.error || "Login failed. Please try again.");
+    if (!submittedEmail || !submittedPassword) {
+      setError("Please enter both email and password.");
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const isValidDemoLogin =
+        submittedEmail === "admin@example.com" && submittedPassword === "password";
+
+      if (!isValidDemoLogin) {
+        setError("Invalid credentials.");
         return;
       }
 
-      // Redirect to dashboard
-      router.push("/admin/dashboard");
+      localStorage.setItem("admin_demo_auth", "true");
+
+      const redirectTarget = searchParams.get("redirect");
+      const safeRedirect =
+        redirectTarget && redirectTarget.startsWith("/admin")
+          ? redirectTarget
+          : "/admin/dashboard";
+
+      router.push(safeRedirect);
+      router.refresh();
     } catch (err) {
       setError("An unexpected error occurred. Please try again.");
       console.error("Login error:", err);
@@ -66,6 +87,7 @@ export default function AdminLoginPage() {
               </label>
               <input
                 id="email"
+                name="email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -86,6 +108,7 @@ export default function AdminLoginPage() {
               </label>
               <input
                 id="password"
+                name="password"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -139,16 +162,6 @@ export default function AdminLoginPage() {
             </button>
           </form>
 
-          {/* Help text */}
-          <p className="text-center text-xs text-[#999999] mt-6 border-t border-[#404040] pt-6">
-            For support, contact{" "}
-            <a
-              href="tel:+15733564272"
-              className="text-primary hover:text-primary-light"
-            >
-              (573) 356-4272
-            </a>
-          </p>
         </div>
 
         {/* Demo credentials (remove in production) */}
