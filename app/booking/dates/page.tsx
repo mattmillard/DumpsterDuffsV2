@@ -32,6 +32,7 @@ export default function BookingDatesPage() {
   const [selectedSizeId, setSelectedSizeId] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string>("");
+  const [availabilityWarning, setAvailabilityWarning] = useState<string>("");
 
   useEffect(() => {
     async function loadSizesAndSelection() {
@@ -69,6 +70,44 @@ export default function BookingDatesPage() {
     ? calculatePriceEstimate(selectedSize, rentalDays)
     : null;
 
+  // Check availability when delivery date changes
+  useEffect(() => {
+    async function checkAvailability() {
+      if (!deliveryDate || !selectedSize) return;
+
+      setAvailabilityWarning("");
+
+      try {
+        const response = await fetch(
+          `/api/public/availability?date=${deliveryDate}`,
+        );
+        const availability = await response.json();
+
+        // Check if selected size is blocked
+        const sizeYards = selectedSize.size_yards;
+        const sizeAvailability = availability.sizeAvailability?.find(
+          (sa: any) => sa.sizeYards === sizeYards,
+        );
+
+        if (
+          !sizeAvailability?.bookable ||
+          availability.globallyBlocked ||
+          availability.blacklistedDate
+        ) {
+          const reason =
+            availability.blockedReasons?.[0] ||
+            sizeAvailability?.reason ||
+            "This date is not available for booking";
+          setAvailabilityWarning(reason);
+        }
+      } catch (err) {
+        console.error("Error checking availability:", err);
+      }
+    }
+
+    checkAvailability();
+  }, [deliveryDate, selectedSize]);
+
   const handleBack = () => {
     router.push("/booking");
   };
@@ -86,8 +125,39 @@ export default function BookingDatesPage() {
       return;
     }
 
+    // Check if date has availability warning
+    if (availabilityWarning) {
+      setError(
+        `Cannot proceed: ${availabilityWarning}. Please select a different date.`,
+      );
+      return;
+    }
+
     setIsLoading(true);
     try {
+      // Double-check availability before proceeding
+      const response = await fetch(
+        `/api/public/availability?date=${deliveryDate}`,
+      );
+      const availability = await response.json();
+
+      const sizeYards = selectedSize?.size_yards;
+      const sizeAvailability = availability.sizeAvailability?.find(
+        (sa: any) => sa.sizeYards === sizeYards,
+      );
+
+      if (
+        !sizeAvailability?.bookable ||
+        availability.globallyBlocked ||
+        availability.blacklistedDate
+      ) {
+        setError(
+          "This date is no longer available. Please select a different date.",
+        );
+        setIsLoading(false);
+        return;
+      }
+
       // Store dates in session
       sessionStorage.setItem("booking_delivery_date", deliveryDate);
       sessionStorage.setItem("booking_rental_days", rentalDays.toString());
@@ -95,7 +165,7 @@ export default function BookingDatesPage() {
 
       router.push("/booking/address");
     } catch (err) {
-      setError("Error saving dates. Please try again.");
+      setError("Error validating availability. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -151,6 +221,22 @@ export default function BookingDatesPage() {
                 Pickup Date: {new Date(pickupDate).toLocaleDateString()}
               </p>
             </div>
+
+            {availabilityWarning && (
+              <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-4">
+                <div className="flex items-start gap-2">
+                  <span className="text-yellow-500 text-xl">⚠️</span>
+                  <div>
+                    <p className="text-sm font-semibold text-yellow-500 mb-1">
+                      Date Not Available
+                    </p>
+                    <p className="text-sm text-yellow-400">
+                      {availabilityWarning}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {error && (
               <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4">

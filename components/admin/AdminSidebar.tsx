@@ -7,7 +7,7 @@ import { AdminNavItem } from "@/types/admin";
 
 const ADMIN_NAV_ITEMS: AdminNavItem[] = [
   { name: "Dashboard", href: "/admin", icon: "📊" },
-  { name: "Bookings", href: "/admin/bookings", icon: "📋", badge: 3 },
+  { name: "Bookings", href: "/admin/bookings", icon: "📋" },
   { name: "Calendar", href: "/admin/calendar", icon: "📅" },
   { name: "Inventory", href: "/admin/inventory", icon: "📦" },
   { name: "Service Zones", href: "/admin/zones", icon: "🗺️" },

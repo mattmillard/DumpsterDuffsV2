@@ -4,7 +4,7 @@ import { DumpsterSizeOption, PriceEstimate } from "@/types/booking";
 
 // Mock pricing data - will be replaced with Supabase queries
 const tariffRates = {
-  tax_rate: 0.07, // 7% tax
+  tax_rate: 0, // No tax - flat pricing
   base_delivery_fee: 0,
   zone_fees: {
     downtown: 0,
@@ -38,19 +38,18 @@ export function calculatePriceEstimate(
       tariffRates.zone_fees[zone as keyof typeof tariffRates.zone_fees];
   }
 
-  // Calculate tax
-  const taxBase = subtotal + deliveryFee;
-  const tax = taxBase * tariffRates.tax_rate;
+  // No tax - flat pricing
+  const tax = 0;
 
   // Total
-  const total = taxBase + tax;
+  const total = subtotal + deliveryFee;
 
   return {
     subtotal: Math.round(subtotal * 100) / 100,
     deliveryFee: Math.round(deliveryFee * 100) / 100, // camelCase to match component props
-    tax: Math.round(tax * 100) / 100,
+    tax: 0,
     total: Math.round(total * 100) / 100,
-    formula: `Base 3-day rental (${size.price_base}) + Extra Days (${extraDays}×${size.price_per_day}) + Delivery (${deliveryFee}) + Tax (7%)`,
+    formula: `Base 3-day rental (${size.price_base}) + Extra Days (${extraDays}×${size.price_per_day}) + Delivery (${deliveryFee})`,
   };
 }
 

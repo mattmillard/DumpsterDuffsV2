@@ -148,7 +148,9 @@ function normalizePricing(pricing: PricingItem[]): PricingItem[] {
 }
 
 function normalizeInventory(inventory: InventoryItem[]): InventoryItem[] {
-  return mergeById(DEFAULT_INVENTORY, inventory);
+  // Don't merge with defaults - just return what was stored
+  // This allows updates to persist without being overwritten by defaults
+  return inventory;
 }
 
 async function ensureBucket() {

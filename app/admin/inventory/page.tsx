@@ -6,6 +6,7 @@ import {
   DashboardGrid,
 } from "@/components/admin/DashboardComponents";
 import { AdminTable } from "@/components/admin/AdminTable";
+import { InventoryModal } from "@/components/admin/InventoryModal";
 
 type InventoryRow = {
   id: string;
@@ -18,6 +19,8 @@ type InventoryRow = {
 export default function AdminInventoryPage() {
   const [inventory, setInventory] = useState<InventoryRow[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedInventory, setSelectedInventory] =
+    useState<InventoryRow | null>(null);
 
   const loadInventory = async () => {
     setLoading(true);
@@ -49,23 +52,19 @@ export default function AdminInventoryPage() {
     return { total, available, inUse };
   }, [inventory]);
 
-  const editInventory = async (row: InventoryRow) => {
-    const total = prompt("Total units", String(row.total_units));
-    if (!total) return;
-
-    const available = prompt("Available units", String(row.available_units));
-    if (!available) return;
-
+  const handleSave = async (updated: InventoryRow) => {
     await fetch("/api/admin/inventory", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        ...row,
-        total_units: Number(total),
-        available_units: Number(available),
-      }),
+      body: JSON.stringify(updated),
     });
+    await loadInventory();
+  };
 
+  const handleDelete = async (id: string) => {
+    await fetch(`/api/admin/inventory?id=${id}`, {
+      method: "DELETE",
+    });
     await loadInventory();
   };
 
@@ -105,12 +104,19 @@ export default function AdminInventoryPage() {
         rows={rows}
         actions={(row) => (
           <button
-            onClick={() => editInventory(row as InventoryRow)}
+            onClick={() => setSelectedInventory(row as InventoryRow)}
             className="text-primary hover:text-primary-light text-sm font-medium"
           >
             Manage
           </button>
         )}
+      />
+
+      <InventoryModal
+        inventory={selectedInventory}
+        onClose={() => setSelectedInventory(null)}
+        onSave={handleSave}
+        onDelete={handleDelete}
       />
     </div>
   );

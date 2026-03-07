@@ -65,15 +65,10 @@ export function PriceSummary({
               <span>{formatCurrency(subtotal)}</span>
             </div>
 
-            <div className="flex justify-between text-white text-sm mb-2">
-              <span className="text-[#999999]">Delivery Fee</span>
-              <span>{formatCurrency(deliveryFee)}</span>
-            </div>
-
-            {tax > 0 && (
+            {deliveryFee > 0 && (
               <div className="flex justify-between text-white text-sm mb-2">
-                <span className="text-[#999999]">Tax</span>
-                <span>{formatCurrency(tax)}</span>
+                <span className="text-[#999999]">Delivery Fee</span>
+                <span>{formatCurrency(deliveryFee)}</span>
               </div>
             )}
           </>

@@ -43,3 +43,25 @@ export async function PUT(request: Request) {
     );
   }
 }
+
+export async function DELETE(request: Request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get("id");
+
+    if (!id) {
+      return NextResponse.json({ error: "ID is required" }, { status: 400 });
+    }
+
+    const inventory = await getInventoryConfig();
+    const filtered = inventory.filter((item) => item.id !== id);
+
+    await setInventoryConfig(filtered);
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    return NextResponse.json(
+      { error: "Failed to delete inventory" },
+      { status: 500 },
+    );
+  }
+}
