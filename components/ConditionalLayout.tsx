@@ -8,13 +8,15 @@ import { StickyCTA } from "./StickyCTA";
 export function ConditionalLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const isBookingPage = pathname?.startsWith("/booking");
+  const isAdminPage = pathname?.startsWith("/admin");
+  const showPublicChrome = !isBookingPage && !isAdminPage;
 
   return (
     <>
-      {!isBookingPage && <Header />}
+      {showPublicChrome && <Header />}
       <main>{children}</main>
-      {!isBookingPage && <Footer />}
-      {!isBookingPage && <StickyCTA />}
+      {showPublicChrome && <Footer />}
+      {showPublicChrome && <StickyCTA />}
     </>
   );
 }
