@@ -27,6 +27,9 @@ export default function AdminBookingsPage() {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [loading, setLoading] = useState(true);
+  const [editingBooking, setEditingBooking] = useState<BookingRow | null>(null);
+  const [selectedStatus, setSelectedStatus] = useState("");
+  const [isUpdating, setIsUpdating] = useState(false);
 
   const loadBookings = async () => {
     setLoading(true);
@@ -46,21 +49,36 @@ export default function AdminBookingsPage() {
   }, []);
 
   const updateStatus = async (booking: BookingRow) => {
-    const nextStatus = prompt(
-      `Status (${STATUS_OPTIONS.join(", ")})`,
-      booking.status,
-    );
-    if (!nextStatus || !STATUS_OPTIONS.includes(nextStatus)) {
-      return;
+    setEditingBooking(booking);
+    setSelectedStatus(booking.status);
+  };
+
+  const handleStatusUpdate = async () => {
+    if (!editingBooking || !selectedStatus) return;
+
+    setIsUpdating(true);
+    try {
+      const response = await fetch("/api/admin/bookings", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: editingBooking.id, status: selectedStatus }),
+      });
+
+      if (response.ok) {
+        setEditingBooking(null);
+        setSelectedStatus("");
+        await loadBookings();
+      } else {
+        alert("Failed to update booking status");
+      }
+    } finally {
+      setIsUpdating(false);
     }
+  };
 
-    await fetch("/api/admin/bookings", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id: booking.id, status: nextStatus }),
-    });
-
-    await loadBookings();
+  const closeModal = () => {
+    setEditingBooking(null);
+    setSelectedStatus("");
   };
 
   const deleteBooking = async (booking: BookingRow) => {
@@ -158,6 +176,63 @@ export default function AdminBookingsPage() {
           </div>
         )}
       />
+
+      {/* Status Update Modal */}
+      {editingBooking && (
+        <>
+          {/* Backdrop */}
+          <div
+            className="fixed inset-0 bg-black/50 z-40"
+            onClick={closeModal}
+          />
+
+          {/* Modal */}
+          <div className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#1A1A1A] border border-[#404040] rounded-lg p-8 max-w-md w-full z-50 shadow-2xl">
+            <h2 className="text-2xl font-bold text-white mb-2">
+              Update Booking Status
+            </h2>
+            <p className="text-[#999999] mb-6">
+              Booking: {editingBooking.id.slice(0, 8)} • {editingBooking.customer_name}
+            </p>
+
+            <div className="space-y-4 mb-6">
+              <label className="block">
+                <span className="text-sm font-medium text-[#999999] mb-2 block">
+                  Select New Status
+                </span>
+                <select
+                  value={selectedStatus}
+                  onChange={(e) => setSelectedStatus(e.target.value)}
+                  className="input-field w-full"
+                >
+                  {STATUS_OPTIONS.map((status) => (
+                    <option key={status} value={status}>
+                      {status.charAt(0).toUpperCase() + status.slice(1)}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                onClick={handleStatusUpdate}
+                disabled={isUpdating || selectedStatus === editingBooking.status}
+                className="flex-1 bg-primary hover:bg-primary-dark disabled:bg-[#404040] disabled:text-[#999999] text-white font-medium py-2 px-4 rounded-lg transition-colors"
+              >
+                {isUpdating ? "Updating..." : "Update Status"}
+              </button>
+              <button
+                onClick={closeModal}
+                disabled={isUpdating}
+                className="flex-1 bg-[#2A2A2A] hover:bg-[#3A3A3A] disabled:bg-[#404040] text-white font-medium py-2 px-4 rounded-lg transition-colors"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }
