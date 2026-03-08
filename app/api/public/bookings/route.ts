@@ -83,12 +83,13 @@ export async function POST(request: Request) {
     const bookingId = data.id;
     const bookingNumber = bookingId.slice(0, 8).toUpperCase();
 
-    // Try to send confirmation email (optional)
+    // Try to send confirmation email (optional - skip if env vars missing)
     let emailSent = false;
     try {
       const resendApiKey = process.env.RESEND_API_KEY;
       const fromEmail = process.env.BOOKING_FROM_EMAIL;
 
+      // Only try to send email if all required env vars are present
       if (resendApiKey && fromEmail && payload.customer_email) {
         const resend = new Resend(resendApiKey);
         
@@ -130,6 +131,8 @@ export async function POST(request: Request) {
           console.log("Email sent successfully:", response.data?.id);
           emailSent = true;
         }
+      } else {
+        console.log("Email skipped - missing config. ApiKey:", !!resendApiKey, "FromEmail:", !!fromEmail, "CustomerEmail:", !!payload.customer_email);
       }
     } catch (emailError) {
       console.error("Email send error:", emailError);
