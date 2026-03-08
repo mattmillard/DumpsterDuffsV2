@@ -1,4 +1,13 @@
 export default function ServiceAreas() {
+  const sameDayCities = new Set([
+    "Columbia",
+    "Hallsville",
+    "Harrisburg",
+    "Stephens",
+    "Murry",
+    "Centralia",
+  ]);
+
   // Missouri cities served (573 area code region)
   const serviceAreas = [
     { city: "Columbia", priority: "primary" },
@@ -13,6 +22,8 @@ export default function ServiceAreas() {
     { city: "California", priority: "secondary" },
     { city: "Hallsville", priority: "secondary" },
     { city: "Harrisburg", priority: "secondary" },
+    { city: "Stephens", priority: "secondary" },
+    { city: "Murry", priority: "secondary" },
     { city: "Centralia", priority: "secondary" },
     { city: "Wardsville", priority: "secondary" },
   ];
@@ -30,7 +41,8 @@ export default function ServiceAreas() {
           </h2>
           <p className="text-lg text-[#999999] max-w-2xl mx-auto">
             Local, veteran-owned, and committed to our communities. Same-day
-            delivery in Columbia.
+            delivery in Columbia, Hallsville, Harrisburg, Stephens, Murry, and
+            Centralia.
           </p>
         </div>
 
@@ -68,7 +80,7 @@ export default function ServiceAreas() {
                     <h3 className="text-xl font-bold text-white">
                       {area.city}
                     </h3>
-                    {area.city === "Columbia" && (
+                    {sameDayCities.has(area.city) && (
                       <p className="text-sm text-primary font-semibold">
                         ✓ Same-day delivery
                       </p>
@@ -102,6 +114,11 @@ export default function ServiceAreas() {
                   </svg>
                   {area.city}
                 </span>
+                {sameDayCities.has(area.city) && (
+                  <p className="text-xs text-primary mt-1 font-semibold">
+                    Same-day
+                  </p>
+                )}
               </div>
             ))}
           </div>

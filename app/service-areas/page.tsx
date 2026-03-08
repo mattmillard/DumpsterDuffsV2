@@ -3,10 +3,19 @@ import { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Service Areas | Dumpster Duff's",
   description:
-    "Serving central Missouri including Columbia, Jefferson City, and surrounding areas. Same-day delivery available in Columbia.",
+    "Serving central Missouri including Columbia, Jefferson City, and surrounding areas. Same-day delivery is available in select cities.",
 };
 
 export default function ServiceAreas() {
+  const sameDayCities = new Set([
+    "Columbia",
+    "Hallsville",
+    "Harrisburg",
+    "Stephens",
+    "Murry",
+    "Centralia",
+  ]);
+
   const areas = [
     "Columbia",
     "Jefferson City",
@@ -20,6 +29,8 @@ export default function ServiceAreas() {
     "California",
     "Hallsville",
     "Harrisburg",
+    "Stephens",
+    "Murry",
     "Centralia",
     "Wardsville",
   ];
@@ -65,7 +76,7 @@ export default function ServiceAreas() {
                   </svg>
                   <div>
                     <h3 className="text-lg font-bold text-white">{city}</h3>
-                    {city === "Columbia" ? (
+                    {sameDayCities.has(city) ? (
                       <p className="text-sm text-primary font-semibold">
                         Same-day delivery available
                       </p>
@@ -94,7 +105,8 @@ export default function ServiceAreas() {
                 <strong>Delivery Fee:</strong> Included in price for most areas
               </p>
               <p>
-                <strong>Same-Day Delivery:</strong> Available in Columbia only
+                <strong>Same-Day Delivery:</strong> Available in Columbia,
+                Hallsville, Harrisburg, Stephens, Murry, and Centralia
               </p>
             </div>
           </div>
