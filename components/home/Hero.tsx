@@ -1,4 +1,5 @@
 import { getLivePricingSnapshot } from "@/lib/utils/sitePricing";
+import Image from "next/image";
 
 export default async function Hero() {
   const pricing = await getLivePricingSnapshot();
@@ -148,9 +149,11 @@ export default async function Hero() {
           {/* Right Column - Hero Image */}
           <div className="order-1 lg:order-2">
             <div className="relative">
-              <img
+              <Image
                 src="/dd2.png"
                 alt="Professional dumpster delivery on residential driveway"
+                width={1200}
+                height={800}
                 className="rounded-2xl shadow-2xl w-full h-auto"
               />
               {/* Floating Card */}
