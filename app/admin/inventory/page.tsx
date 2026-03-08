@@ -53,18 +53,30 @@ export default function AdminInventoryPage() {
   }, [inventory]);
 
   const handleSave = async (updated: InventoryRow) => {
-    await fetch("/api/admin/inventory", {
+    const response = await fetch("/api/admin/inventory", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(updated),
     });
+
+    if (!response.ok) {
+      const result = await response.json().catch(() => ({}));
+      throw new Error(result.error || "Failed to update inventory");
+    }
+
     await loadInventory();
   };
 
   const handleDelete = async (id: string) => {
-    await fetch(`/api/admin/inventory?id=${id}`, {
+    const response = await fetch(`/api/admin/inventory?id=${id}`, {
       method: "DELETE",
     });
+
+    if (!response.ok) {
+      const result = await response.json().catch(() => ({}));
+      throw new Error(result.error || "Failed to delete inventory");
+    }
+
     await loadInventory();
   };
 

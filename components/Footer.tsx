@@ -59,10 +59,10 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  href="/contractors"
+                  href="/junk-removal"
                   className="hover:text-white transition-colors"
                 >
-                  For Contractors
+                  Junk Removal
                 </Link>
               </li>
               <li>

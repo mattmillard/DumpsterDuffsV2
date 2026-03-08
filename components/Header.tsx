@@ -43,10 +43,10 @@ export default function Header() {
               Service Areas
             </Link>
             <Link
-              href="/contractors"
+              href="/junk-removal"
               className="text-white hover:text-primary font-semibold transition-colors"
             >
-              For Contractors
+              Junk Removal
             </Link>
             <Link
               href="/about"
@@ -123,10 +123,10 @@ export default function Header() {
                 Service Areas
               </Link>
               <Link
-                href="/contractors"
+                href="/junk-removal"
                 className="text-white hover:text-primary font-semibold py-2 transition-colors"
               >
-                For Contractors
+                Junk Removal
               </Link>
               <Link
                 href="/about"

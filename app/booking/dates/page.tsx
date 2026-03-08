@@ -90,10 +90,7 @@ export default function BookingDatesPage() {
         );
 
         // Show warning if date is NOT bookable or has blocking reasons
-        if (
-          sizeAvailability && 
-          !sizeAvailability.isBookable
-        ) {
+        if (sizeAvailability && !sizeAvailability.isBookable) {
           const reason =
             availability.blockedReasons?.[0] ||
             "This date is not available for booking";

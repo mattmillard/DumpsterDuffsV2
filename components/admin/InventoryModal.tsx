@@ -34,6 +34,7 @@ export function InventoryModal({
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [error, setError] = useState("");
+  const [backdropPointerDown, setBackdropPointerDown] = useState(false);
 
   useEffect(() => {
     if (inventory) {
@@ -45,6 +46,20 @@ export function InventoryModal({
   }, [inventory]);
 
   if (!inventory) return null;
+
+  const handleBackdropMouseDown = (
+    event: React.MouseEvent<HTMLDivElement>,
+  ) => {
+    setBackdropPointerDown(event.target === event.currentTarget);
+  };
+
+  const handleBackdropMouseUp = (event: React.MouseEvent<HTMLDivElement>) => {
+    const endedOnBackdrop = event.target === event.currentTarget;
+    if (backdropPointerDown && endedOnBackdrop) {
+      onClose();
+    }
+    setBackdropPointerDown(false);
+  };
 
   const handleSave = async () => {
     setError("");
@@ -70,7 +85,7 @@ export function InventoryModal({
       });
       onClose();
     } catch (err) {
-      setError("Failed to save changes");
+      setError(err instanceof Error ? err.message : "Failed to save changes");
     } finally {
       setIsSaving(false);
     }
@@ -89,7 +104,7 @@ export function InventoryModal({
       await onDelete(inventory.id);
       onClose();
     } catch (err) {
-      setError("Failed to delete item");
+      setError(err instanceof Error ? err.message : "Failed to delete item");
     } finally {
       setIsDeleting(false);
     }
@@ -98,7 +113,8 @@ export function InventoryModal({
   return (
     <div
       className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4"
-      onClick={onClose}
+      onMouseDown={handleBackdropMouseDown}
+      onMouseUp={handleBackdropMouseUp}
     >
       <div
         className="bg-[#1A1A1A] border border-[#404040] rounded-lg max-w-lg w-full p-6"

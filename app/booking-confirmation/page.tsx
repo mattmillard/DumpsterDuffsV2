@@ -54,7 +54,8 @@ function BookingConfirmationContent() {
             {!emailSent && (
               <div className="mb-6 rounded-lg border border-yellow-500/40 bg-yellow-500/10 p-3">
                 <p className="text-sm text-yellow-300">
-                  Booking saved successfully, but confirmation email was not sent.
+                  Booking saved successfully, but confirmation email was not
+                  sent.
                 </p>
               </div>
             )}
