@@ -132,23 +132,30 @@ export default function BookingReviewPage() {
         return;
       }
 
-      // TODO: Integrate with Stripe checkout
-      // For now, show a placeholder
-      console.log("Booking data:", bookingData);
+      const createResponse = await fetch("/api/public/bookings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...bookingData,
+          size_yards: selectedSize?.size_yards,
+        }),
+      });
 
-      // In production, this would:
-      // 1. Create booking record in database
-      // 2. Initialize Stripe payment
-      // 3. Redirect to Stripe or payment page
+      const createResult = await createResponse.json();
 
-      // Placeholder: just show confirmation
-      alert(
-        "Checkout flow would be initiated here. Stripe integration coming next!",
-      );
+      if (!createResponse.ok) {
+        setError(createResult.error || "Could not complete booking.");
+        setIsLoading(false);
+        return;
+      }
 
-      // Simulate successful booking
       sessionStorage.clear();
-      router.push("/booking-confirmation?booking_id=demo-123");
+      const params = new URLSearchParams({
+        booking_id: createResult.bookingId,
+        booking_number: createResult.bookingNumber,
+        email_sent: String(Boolean(createResult.emailSent)),
+      });
+      router.push(`/booking-confirmation?${params.toString()}`);
     } catch (err) {
       setError("Error processing checkout. Please try again.");
     } finally {

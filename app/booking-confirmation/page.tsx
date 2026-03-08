@@ -7,6 +7,8 @@ import { Suspense } from "react";
 function BookingConfirmationContent() {
   const searchParams = useSearchParams();
   const bookingId = searchParams.get("booking_id");
+  const bookingNumber = searchParams.get("booking_number");
+  const emailSent = searchParams.get("email_sent") !== "false";
 
   return (
     <div className="min-h-screen bg-[#0F0F0F] py-12 md:py-16 lg:py-20 px-4 md:px-6 flex items-center justify-center">
@@ -45,9 +47,17 @@ function BookingConfirmationContent() {
                 Booking Number
               </p>
               <p className="text-2xl font-bold text-white font-mono">
-                {bookingId || "PENDING"}
+                {bookingNumber || bookingId || "PENDING"}
               </p>
             </div>
+
+            {!emailSent && (
+              <div className="mb-6 rounded-lg border border-yellow-500/40 bg-yellow-500/10 p-3">
+                <p className="text-sm text-yellow-300">
+                  Booking saved successfully, but confirmation email was not sent.
+                </p>
+              </div>
+            )}
 
             <div className="border-t border-[#404040] pt-6">
               <h3 className="font-bold text-white mb-4">What happens next?</h3>
