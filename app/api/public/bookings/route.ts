@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
+import { Resend } from "resend";
 
 type CreateBookingPayload = {
   // Size
@@ -38,6 +39,8 @@ export async function POST(request: Request) {
   try {
     const payload = (await request.json()) as CreateBookingPayload;
 
+    console.log("Received booking payload:", JSON.stringify(payload, null, 2));
+
     // Prepare booking record
     const bookingRecord = {
       customer_name: payload.customer_full_name,
@@ -69,7 +72,8 @@ export async function POST(request: Request) {
       .single();
 
     if (error) {
-      console.error("Booking insert error:", error);
+      console.error("Booking insert error:", JSON.stringify(error, null, 2));
+      console.error("Booking record:", JSON.stringify(bookingRecord, null, 2));
       return NextResponse.json(
         { error: "Failed to create booking. Please try again." },
         { status: 500 },
