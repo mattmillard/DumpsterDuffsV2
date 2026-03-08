@@ -3,7 +3,7 @@ import { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Service Areas | Dumpster Duff's",
   description:
-    "Serving central Missouri including Columbia, Jefferson City, and surrounding areas. Same-day delivery available.",
+    "Serving central Missouri including Columbia, Jefferson City, and surrounding areas. Same-day delivery available in Columbia.",
 };
 
 export default function ServiceAreas() {
@@ -63,9 +63,15 @@ export default function ServiceAreas() {
                   </svg>
                   <div>
                     <h3 className="text-lg font-bold text-white">{city}</h3>
-                    <p className="text-sm text-primary font-semibold">
-                      Same-day delivery available
-                    </p>
+                    {city === "Columbia" ? (
+                      <p className="text-sm text-primary font-semibold">
+                        Same-day delivery available
+                      </p>
+                    ) : (
+                      <p className="text-sm text-white/60">
+                        Scheduled delivery available
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>
@@ -86,8 +92,7 @@ export default function ServiceAreas() {
                 <strong>Delivery Fee:</strong> Included in price for most areas
               </p>
               <p>
-                <strong>Same-Day Delivery:</strong> Available for most orders
-                within our service area
+                <strong>Same-Day Delivery:</strong> Available in Columbia only
               </p>
             </div>
           </div>
