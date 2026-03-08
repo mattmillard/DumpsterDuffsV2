@@ -14,6 +14,8 @@ export default function ServiceAreas() {
     "Stephens",
     "Murry",
     "Centralia",
+    "Riggs",
+    "Sturgeon",
   ]);
 
   const areas = [
@@ -32,6 +34,8 @@ export default function ServiceAreas() {
     "Stephens",
     "Murry",
     "Centralia",
+    "Riggs",
+    "Sturgeon",
     "Wardsville",
   ];
 
@@ -106,7 +110,8 @@ export default function ServiceAreas() {
               </p>
               <p>
                 <strong>Same-Day Delivery:</strong> Available in Columbia,
-                Hallsville, Harrisburg, Stephens, Murry, and Centralia
+                Hallsville, Harrisburg, Stephens, Murry, Centralia, Riggs, and
+                Sturgeon
               </p>
             </div>
           </div>

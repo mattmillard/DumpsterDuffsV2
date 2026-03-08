@@ -6,6 +6,8 @@ export default function ServiceAreas() {
     "Stephens",
     "Murry",
     "Centralia",
+    "Riggs",
+    "Sturgeon",
   ]);
 
   // Missouri cities served (573 area code region)
@@ -25,6 +27,8 @@ export default function ServiceAreas() {
     { city: "Stephens", priority: "secondary" },
     { city: "Murry", priority: "secondary" },
     { city: "Centralia", priority: "secondary" },
+    { city: "Riggs", priority: "secondary" },
+    { city: "Sturgeon", priority: "secondary" },
     { city: "Wardsville", priority: "secondary" },
   ];
 
@@ -42,7 +46,7 @@ export default function ServiceAreas() {
           <p className="text-lg text-[#999999] max-w-2xl mx-auto">
             Local, veteran-owned, and committed to our communities. Same-day
             delivery in Columbia, Hallsville, Harrisburg, Stephens, Murry, and
-            Centralia.
+            Centralia, Riggs, and Sturgeon.
           </p>
         </div>
 
