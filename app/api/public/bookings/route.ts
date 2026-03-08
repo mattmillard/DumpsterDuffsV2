@@ -41,27 +41,22 @@ export async function POST(request: Request) {
 
     console.log("Received booking payload:", JSON.stringify(payload, null, 2));
 
-    // Prepare booking record
+    // Prepare booking record (match production schema)
+    const addressLine2 = payload.delivery_address_line_2?.trim() ? ` ${payload.delivery_address_line_2}` : "";
+    const fullAddress = `${payload.delivery_address_line_1}${addressLine2}, ${payload.delivery_city}, ${payload.delivery_state} ${payload.delivery_zip}`;
+
     const bookingRecord = {
       customer_name: payload.customer_full_name,
-      customer_email: payload.customer_email || null,
+      customer_email: payload.customer_email,
       customer_phone: payload.customer_phone,
-      customer_company: payload.customer_company || null,
       size_yards: payload.size_yards,
+      delivery_address: fullAddress,
       delivery_date: payload.delivery_date,
       return_date: payload.pickup_date,
-      delivery_address_line_1: payload.delivery_address_line_1,
-      delivery_address_line_2: payload.delivery_address_line_2 || null,
-      delivery_city: payload.delivery_city,
-      delivery_state: payload.delivery_state,
-      delivery_zip: payload.delivery_zip,
-      placement_notes: payload.placement_notes || null,
-      subtotal: payload.subtotal,
-      delivery_fee: payload.delivery_fee,
-      tax: payload.tax,
       total_price: payload.total,
-      payment_status: "pending",
       status: "pending",
+      payment_status: "pending",
+      notes: payload.placement_notes || null,
     };
 
     // Insert booking into database
@@ -106,7 +101,7 @@ export async function POST(request: Request) {
                 <li><strong>Dumpster Size:</strong> ${payload.size_yards} Yard</li>
                 <li><strong>Delivery Date:</strong> ${payload.delivery_date}</li>
                 <li><strong>Pickup Date:</strong> ${payload.pickup_date}</li>
-                <li><strong>Delivery Address:</strong> ${payload.delivery_address_line_1}, ${payload.delivery_city}, ${payload.delivery_state} ${payload.delivery_zip}</li>
+                <li><strong>Delivery Address:</strong> ${fullAddress}</li>
                 <li><strong>Total Price:</strong> $${payload.total.toFixed(2)}</li>
               </ul>
               
