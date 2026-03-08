@@ -1,9 +1,9 @@
 {
-  "name": "Dumpster Duff's Admin",
+  "name": "Dumpster Duff's",
   "short_name": "DumpsterDuff",
-  "description": "Mobile operations app for managing dumpster rentals",
-  "start_url": "/admin/dashboard",
-  "scope": "/admin",
+  "description": "Dumpster rental booking and service management",
+  "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "orientation": "portrait-primary",
   "background_color": "#0F0F0F",
