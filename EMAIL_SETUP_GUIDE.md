@@ -39,26 +39,29 @@ Your existing email forwarding uses these records (leave them alone):
 - **MX Records** pointing to GoDaddy's mail servers
 - These handle `dustin@dumpsterduffs.com` forwarding
 
-### New Records to Add for Resend
+### DNS Records to Configure
 
 Go to GoDaddy → My Products → DNS → Manage DNS for `dumpsterduffs.com`
 
-#### A. SPF Record (Allows Resend to Send on Your Behalf)
+#### A. SPF Record (Allows Both GoDaddy and Resend to Send)
 
-**If you already have an SPF record:**
-- Find the existing TXT record that starts with `v=spf1`
-- Edit it to include Resend: `v=spf1 include:_spf.mx.cloudflare.net include:_spf.google.com include:eu.sparkpostmail.com ~all`
-- Replace with actual domains you use. If none exist yet: `v=spf1 include:eu.sparkpostmail.com ~all`
+**Critical:** You need BOTH GoDaddy (for email forwarding) AND Resend (for booking confirmations) in one SPF record.
 
-**If you DON'T have an SPF record:**
+**Find and REPLACE your existing SPF record with:**
 ```
 Type: TXT
 Name: @ (or leave blank)
-Value: v=spf1 include:eu.sparkpostmail.com ~all
+Value: v=spf1 include:secureserver.net include:eu.sparkpostmail.com ~all
 TTL: 3600
 ```
 
-**⚠️ IMPORTANT:** Only ONE SPF record per domain. If you have existing includes, merge them.
+**Explanation:**
+- `v=spf1` - SPF version
+- `include:secureserver.net` - Authorizes GoDaddy email forwarding
+- `include:eu.sparkpostmail.com` - Authorizes Resend transactional emails
+- `~all` - Soft fail (recommended during setup, can change to `-all` later)
+
+**⚠️ CRITICAL:** Only ONE SPF record per domain. Delete any other TXT records starting with `v=spf1`.
 
 #### B. DKIM Records (Authenticates Resend Emails)
 
@@ -194,7 +197,7 @@ Value: smtp.secureserver.net (priority 0)
 ```
 Type: TXT
 Name: @
-Value: v=spf1 include:eu.sparkpostmail.com ~all
+Value: v=spf1 include:secureserver.net include:eu.sparkpostmail.com ~all
 
 Type: TXT
 Name: resend._domainkey
