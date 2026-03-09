@@ -44,6 +44,12 @@ function AdminLoginForm() {
         return;
       }
 
+      const queryParams = new URLSearchParams(window.location.search);
+      if (queryParams.get("mode") === "reset") {
+        setMode("reset");
+        setMessage("Enter your new password below.");
+      }
+
       const hash = window.location.hash.replace(/^#/, "");
       if (!hash) {
         setIsInitializing(false);
@@ -90,6 +96,36 @@ function AdminLoginForm() {
 
     initializeAuthFlow();
   }, []);
+
+  const handleForgotPassword = async () => {
+    setError("");
+    setMessage("");
+
+    const submittedEmail = email.trim().toLowerCase();
+    if (!submittedEmail) {
+      setError("Enter your email address first, then click Forgot password.");
+      return;
+    }
+
+    try {
+      const { error: resetError } = await supabase.auth.resetPasswordForEmail(
+        submittedEmail,
+        {
+          redirectTo: `${window.location.origin}/auth/callback?type=recovery`,
+        },
+      );
+
+      if (resetError) {
+        setError(resetError.message || "Unable to send password reset email.");
+        return;
+      }
+
+      setMessage("Password reset email sent. Check your inbox.");
+    } catch (err) {
+      console.error("Forgot password error:", err);
+      setError("An unexpected error occurred. Please try again.");
+    }
+  };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -309,6 +345,13 @@ function AdminLoginForm() {
                   className="input-field w-full"
                   required
                 />
+                <button
+                  type="button"
+                  onClick={handleForgotPassword}
+                  className="mt-2 text-sm text-primary hover:text-primary-light"
+                >
+                  Forgot password?
+                </button>
               </div>
 
               {message && (
