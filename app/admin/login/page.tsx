@@ -1,7 +1,7 @@
 "use client";
 
 import { Suspense } from "react";
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { adminLogin } from "@/lib/auth/admin";
@@ -30,8 +30,14 @@ function AdminLoginForm() {
   const [message, setMessage] = useState("");
   const [mode, setMode] = useState<"login" | "reset">("login");
   const [isInitializing, setIsInitializing] = useState(true);
+  const hasInitializedRef = useRef(false);
 
   useEffect(() => {
+    if (hasInitializedRef.current) {
+      return;
+    }
+    hasInitializedRef.current = true;
+
     async function initializeAuthFlow() {
       if (typeof window === "undefined") {
         setIsInitializing(false);

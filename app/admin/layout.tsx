@@ -23,11 +23,16 @@ export default function AdminLayout({
   const isLoginPage = pathname === "/admin/login";
 
   useEffect(() => {
+    if (isLoginPage) {
+      setLoading(false);
+      return;
+    }
+
     async function checkAuth() {
       try {
         const adminUser = await getCurrentAdminUser();
 
-        if (!adminUser && !isLoginPage) {
+        if (!adminUser) {
           router.push(`/admin/login?redirect=${encodeURIComponent(pathname)}`);
           return;
         }
@@ -37,10 +42,8 @@ export default function AdminLayout({
         }
       } catch (err) {
         console.error("Auth error:", err);
-        if (!isLoginPage) {
-          setError("Authentication failed");
-          router.push("/admin/login");
-        }
+        setError("Authentication failed");
+        router.push("/admin/login");
       } finally {
         setLoading(false);
       }
@@ -50,7 +53,7 @@ export default function AdminLayout({
 
     // Listen for auth state changes
     const subscription = onAuthStateChange((adminUser) => {
-      if (!adminUser && !isLoginPage) {
+      if (!adminUser) {
         router.push("/admin/login");
       } else {
         setUser(adminUser);
