@@ -477,7 +477,7 @@ Dumpster Duff's Admin System
 
         const adminResponse = await resend.emails.send({
           from: `"Dumpster Duff's" <${fromEmail}>`,
-          to: "wantsomekarn@gmail.com",
+          to: "dustin@dumpsterduffs.com",
           replyTo: "dustin@dumpsterduffs.com",
           subject: `New Booking Notification: ${bookingNumber}`,
           html: adminEmailHtml,
