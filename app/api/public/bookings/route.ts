@@ -261,7 +261,6 @@ Dumpster Duff's
             "X-Priority": "1",
             "Importance": "high",
             "X-Entity-Type": "transactional_receipt",
-            "List-Unsubscribe": "<mailto:dustin@dumpsterduffs.com?subject=Unsubscribe>",
           },
         });
 
