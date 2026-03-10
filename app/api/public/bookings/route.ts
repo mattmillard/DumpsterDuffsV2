@@ -461,7 +461,7 @@ Dumpster Duff's Admin System
 
         const adminResponse = await resend.emails.send({
           from: `"Dumpster Duff's" <${fromEmail}>`,
-          to: "matt.millard@icloud.com",
+          to: "wantsomekarn@gmail.com",
           replyTo: "dustin@dumpsterduffs.com",
           subject: `New Booking Notification: ${bookingNumber}`,
           html: adminEmailHtml,
@@ -470,7 +470,6 @@ Dumpster Duff's Admin System
             "X-Priority": "1",
             "Importance": "high",
             "X-Entity-Type": "transactional",
-            "List-Unsubscribe": "<mailto:dustin@dumpsterduffs.com?subject=Unsubscribe>",
           },
         });
 
