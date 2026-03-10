@@ -395,10 +395,14 @@ export async function freeDate(params: {
     .eq("date", params.date)
     .eq("is_active", true);
 
-  if (params.size_yards == null) {
-    query = query.is("size_yards", null);
-  } else {
-    query = query.eq("size_yards", params.size_yards);
+  // If size_yards is explicitly provided (not undefined), filter by it
+  // If size_yards is undefined (Free All), update all blocks for that date
+  if (params.size_yards !== undefined) {
+    if (params.size_yards === null) {
+      query = query.is("size_yards", null);
+    } else {
+      query = query.eq("size_yards", params.size_yards);
+    }
   }
 
   const { error } = await query;

@@ -136,7 +136,7 @@ export default function AdminCalendarPage() {
       body: JSON.stringify({
         action: "free_date",
         date,
-        size_yards: sizeYards ?? null,
+        ...(sizeYards !== undefined && { size_yards: sizeYards }),
       }),
     });
 
@@ -445,6 +445,22 @@ export default function AdminCalendarPage() {
                       {dayBookings.length} active booking(s)
                     </p>
                   </div>
+
+                  {/* Blocked Reasons */}
+                  {selectedDay.blockedReasons.length > 0 && (
+                    <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-3">
+                      <p className="text-xs font-semibold text-red-400 uppercase mb-2">
+                        🚫 Blocked
+                      </p>
+                      <div className="space-y-1">
+                        {selectedDay.blockedReasons.map((reason, idx) => (
+                          <p key={idx} className="text-sm text-red-300">
+                            {reason}
+                          </p>
+                        ))}
+                      </div>
+                    </div>
+                  )}
 
                   {/* Size Availability */}
                   <div>

@@ -97,7 +97,11 @@ export async function POST(request: Request) {
           id: payload.id,
           date: payload.date,
           size_yards:
-            payload.size_yards == null ? null : Number(payload.size_yards),
+            payload.size_yards === undefined
+              ? undefined
+              : payload.size_yards === null
+                ? null
+                : Number(payload.size_yards),
         });
         break;
       }
