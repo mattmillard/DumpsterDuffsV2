@@ -30,7 +30,6 @@ export function MobileHeader({
       await adminLogout();
       localStorage.removeItem("admin_demo_auth"); // Clean up any legacy demo auth
       router.push("/admin/login");
-      router.refresh();
     } catch (err) {
       console.error("Sign out error:", err);
       // Still redirect to login even if there's an error
