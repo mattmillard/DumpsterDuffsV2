@@ -149,12 +149,21 @@ export default async function Hero() {
           {/* Right Column - Hero Image */}
           <div className="order-1 lg:order-2">
             <div className="relative aspect-[3/2] lg:aspect-auto overflow-hidden rounded-2xl shadow-2xl">
+              {/* Mobile Image */}
+              <Image
+                src="/dd_mobile.png"
+                alt="Professional dumpster delivery on residential driveway"
+                width={1200}
+                height={800}
+                className="w-full h-full object-cover object-center lg:hidden"
+              />
+              {/* Desktop Image */}
               <Image
                 src="/dd2.png"
                 alt="Professional dumpster delivery on residential driveway"
                 width={1200}
                 height={800}
-                className="w-full h-full object-cover object-[center_70%] lg:object-center"
+                className="hidden lg:block w-full h-full object-cover object-center"
               />
               {/* Floating Card */}
               <div className="absolute bottom-4 left-4 right-4 bg-[#1A1A1A] rounded-lg shadow-xl p-4 border-l-4 border-primary">
