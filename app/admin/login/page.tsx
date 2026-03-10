@@ -45,13 +45,30 @@ function AdminLoginForm() {
       }
 
       const queryParams = new URLSearchParams(window.location.search);
-      if (queryParams.get("mode") === "reset") {
-        setMode("reset");
-        setMessage("Enter your new password below.");
+      const isResetMode = queryParams.get("mode") === "reset";
+
+      // Check for existing session (set by callback page)
+      if (isResetMode) {
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+
+        if (session) {
+          // Session already exists from callback, just show reset form
+          setMode("reset");
+          setMessage("Enter your new password below.");
+          setIsInitializing(false);
+          return;
+        }
       }
 
+      // Fall back to handling tokens from hash (direct links)
       const hash = window.location.hash.replace(/^#/, "");
       if (!hash) {
+        if (isResetMode) {
+          setMode("reset");
+          setMessage("Enter your new password below.");
+        }
         setIsInitializing(false);
         return;
       }
@@ -116,14 +133,30 @@ function AdminLoginForm() {
       );
 
       if (resetError) {
-        setError(resetError.message || "Unable to send password reset email.");
+        // Handle rate limiting specifically
+        if (resetError.message?.includes("429") || resetError.status === 429) {
+          setError(
+            "Too many password reset requests. Please wait 30 minutes and try again.",
+          );
+        } else {
+          setError(
+            resetError.message || "Unable to send password reset email.",
+          );
+        }
         return;
       }
 
       setMessage("Password reset email sent. Check your inbox.");
-    } catch (err) {
+    } catch (err: any) {
       console.error("Forgot password error:", err);
-      setError("An unexpected error occurred. Please try again.");
+      // Check if it's a rate limit error
+      if (err?.status === 429 || err?.message?.includes("429")) {
+        setError(
+          "Too many password reset requests. Please wait 30 minutes and try again.",
+        );
+      } else {
+        setError("An unexpected error occurred. Please try again.");
+      }
     }
   };
 
