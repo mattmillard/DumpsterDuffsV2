@@ -2,8 +2,6 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { adminLogout } from "@/lib/auth/admin";
 
 interface MobileHeaderProps {
   title?: string;
@@ -22,19 +20,11 @@ export function MobileHeader({
   userRole = "Owner",
   onSettingsClick,
 }: MobileHeaderProps) {
-  const router = useRouter();
   const [showMenu, setShowMenu] = useState(false);
 
-  const handleSignOut = async () => {
-    try {
-      await adminLogout();
-      localStorage.removeItem("admin_demo_auth"); // Clean up any legacy demo auth
-      router.push("/admin/login");
-    } catch (err) {
-      console.error("Sign out error:", err);
-      // Still redirect to login even if there's an error
-      router.push("/admin/login");
-    }
+  const handleSignOut = () => {
+    localStorage.removeItem("admin_demo_auth");
+    window.location.assign("/auth/signout");
   };
 
   return (

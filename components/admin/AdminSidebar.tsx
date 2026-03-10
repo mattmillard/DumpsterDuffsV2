@@ -1,10 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { AdminNavItem } from "@/types/admin";
-import { adminLogout } from "@/lib/auth/admin";
 
 const ADMIN_NAV_ITEMS: AdminNavItem[] = [
   { name: "Dashboard", href: "/admin", icon: "📊" },
@@ -17,19 +16,11 @@ const ADMIN_NAV_ITEMS: AdminNavItem[] = [
 
 export function AdminSidebar() {
   const pathname = usePathname();
-  const router = useRouter();
   const [isOpen, setIsOpen] = useState(true);
 
-  const handleSignOut = async () => {
-    try {
-      await adminLogout();
-      localStorage.removeItem("admin_demo_auth"); // Clean up any legacy demo auth
-      router.push("/admin/login");
-    } catch (err) {
-      console.error("Sign out error:", err);
-      // Still redirect to login even if there's an error
-      router.push("/admin/login");
-    }
+  const handleSignOut = () => {
+    localStorage.removeItem("admin_demo_auth");
+    window.location.assign("/auth/signout");
   };
 
   return (
