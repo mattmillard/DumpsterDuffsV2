@@ -24,8 +24,15 @@ export default function AdminInventoryPage() {
 			const response = await fetch("/api/admin/inventory", {
 				cache: "no-store",
 			});
+			if (!response.ok) {
+				throw new Error("Failed to load inventory");
+			}
+
 			const data = (await response.json()) as InventoryRow[];
-			setInventory(data || []);
+			setInventory(Array.isArray(data) ? data : []);
+		} catch (error) {
+			console.error("Inventory load error:", error);
+			setInventory([]);
 		} finally {
 			setLoading(false);
 		}
@@ -54,7 +61,12 @@ export default function AdminInventoryPage() {
 			throw new Error(result.error || "Failed to update inventory");
 		}
 
-		await loadInventory();
+		const data = (await response.json()) as InventoryRow[];
+		if (Array.isArray(data)) {
+			setInventory(data);
+		} else {
+			await loadInventory();
+		}
 	};
 
 	const handleDelete = async (id: string) => {
@@ -67,7 +79,12 @@ export default function AdminInventoryPage() {
 			throw new Error(result.error || "Failed to delete inventory");
 		}
 
-		await loadInventory();
+		const data = (await response.json()) as InventoryRow[];
+		if (Array.isArray(data)) {
+			setInventory(data);
+		} else {
+			await loadInventory();
+		}
 	};
 
 	const rows = inventory.map((row) => ({

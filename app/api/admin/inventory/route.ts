@@ -6,10 +6,19 @@ import {
 	type InventoryItem,
 } from "@/lib/admin/config";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export async function GET() {
 	try {
 		const inventory = await getInventoryConfig();
-		return NextResponse.json(inventory);
+		return NextResponse.json(inventory, {
+			headers: {
+				"Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+				Pragma: "no-cache",
+				Expires: "0",
+			},
+		});
 	} catch (error) {
 		return NextResponse.json({ error: "Failed to load inventory" }, { status: 500 });
 	}
@@ -79,7 +88,7 @@ export async function DELETE(request: Request) {
 
 		const sortedFiltered = sortInventoryAvailableFirst(filtered);
 		await setInventoryConfig(sortedFiltered);
-		return NextResponse.json({ success: true });
+		return NextResponse.json(sortedFiltered);
 	} catch (error) {
 		return NextResponse.json({ error: "Failed to delete inventory" }, { status: 500 });
 	}
