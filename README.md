@@ -61,10 +61,14 @@ vercel
 
 ## 🏗️ Tech Stack
 
-- **Framework:** Next.js 14 (App Router)
-- **Styling:** Tailwind CSS
-- **Language:** TypeScript
-- **Deployment:** Vercel-optimized
+- **Frontend App:** Next.js 15 (App Router) + React + TypeScript + Tailwind CSS
+- **Source Control Flow:** GitHub repository (main branch deploy flow)
+- **Hosting/Deploy Flow:** Vercel builds from GitHub and serves production
+- **Domain/DNS/Edge Flow:** GoDaddy domain registration + Cloudflare DNS and edge controls
+- **Auth/Admin Flow:** Supabase Auth + `admin_users` role model (`owner`, `admin`, `dispatcher`)
+- **Booking Flow:** App Router multi-step booking routes (`/booking/address` -> `/booking/dates` -> `/booking/details` -> `/booking/review`)
+- **Email Flow (Current/Target):** Resend for transactional sends + GoDaddy inboxes for human replies/receiving
+- **Payments Flow:** Stripe currently configured; PayPal and Venmo planned next
 
 ---
 
