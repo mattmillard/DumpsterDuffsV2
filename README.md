@@ -505,4 +505,4 @@ For WordPress implementation questions, refer to the "WordPress Mapping Guide" s
 
 ---
 
-**Built with ❤️ for Dumpster Duff's - Proudly serving Missouri since 2020 🇺🇸**
+**Built for Dumpster Duff's - Proudly serving Missouri since 2020 🇺🇸**
