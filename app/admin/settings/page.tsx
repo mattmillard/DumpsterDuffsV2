@@ -41,6 +41,11 @@ export default function AdminSettingsPage() {
 	const [feedback, setFeedback] = useState<string | null>(null);
 	const [search, setSearch] = useState("");
 
+	const handleSignOut = () => {
+		localStorage.removeItem("admin_demo_auth");
+		window.location.assign("/auth/signout");
+	};
+
 	const loadUsers = async () => {
 		setUsersLoading(true);
 		setUsersError(null);
@@ -143,6 +148,11 @@ export default function AdminSettingsPage() {
 					<p className="text-[#999999] mt-2">Manage registered users and monitor system health</p>
 				</div>
 				<div className="flex items-center gap-3">
+					<button
+						onClick={handleSignOut}
+						className="px-4 py-2 rounded-md bg-red-500/10 text-red-300 border border-red-500/40 hover:bg-red-500/20">
+						Sign Out
+					</button>
 					<button
 						onClick={loadUsers}
 						className="px-4 py-2 rounded-md bg-[#262626] text-white border border-[#404040] hover:bg-[#303030]">
