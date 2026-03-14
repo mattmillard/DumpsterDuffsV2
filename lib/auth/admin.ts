@@ -123,7 +123,7 @@ export async function adminLogin(
     const adminUser = await fetchAdminByUserId(signedInUser.id);
 
     if (!adminUser) {
-      await supabase.auth.signOut();
+      await supabase.auth.signOut({ scope: "local" });
       return {
         success: false,
         error:
@@ -150,7 +150,7 @@ export async function adminLogout(): Promise<{
   error?: string;
 }> {
   try {
-    const { error } = await supabase.auth.signOut();
+    const { error } = await supabase.auth.signOut({ scope: "local" });
 
     if (error) {
       return { success: false, error: error.message };

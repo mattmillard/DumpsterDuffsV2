@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    await supabase.auth.signOut();
+    await supabase.auth.signOut({ scope: "local" });
   } catch (error) {
     console.error("Server sign out error:", error);
   }
