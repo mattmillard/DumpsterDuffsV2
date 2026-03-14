@@ -1,290 +1,312 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
-type AnalyticsData = {
-  summary: {
-    totalSessions: number;
-    totalPageViews: number;
-    conversions: number;
-    phoneCalls: number;
-    formStarts: number;
-    formCompletes: number;
-    conversionRate: string;
-  };
-  dailyStats: Array<{
-    date: string;
-    total_events: number;
-    unique_visitors: number;
-    page_views: number;
-    phone_clicks: number;
-    form_starts: number;
-    form_completions: number;
-  }>;
-  topPages: Array<{ path: string; views: number }>;
-  topReferrers: Array<{ source: string; count: number }>;
-  deviceBreakdown: Array<{ type: string; count: number }>;
+type RegisteredUser = {
+	id: string;
+	email: string;
+	created_at: string;
+	email_confirmed_at: string | null;
+	last_sign_in_at: string | null;
+	full_name: string;
+	role: "owner" | "admin" | "dispatcher" | null;
+	is_active_admin: boolean;
+	can_promote: boolean;
+};
+
+type HealthResponse = {
+	status: "healthy" | "degraded";
+	checked_at: string;
+	env: Array<{
+		key: string;
+		present: boolean;
+		required: boolean;
+	}>;
+	services: {
+		database: {
+			reachable: boolean;
+			error: string | null;
+		};
+	};
 };
 
 export default function AdminSettingsPage() {
-  const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [days, setDays] = useState(30);
+	const [users, setUsers] = useState<RegisteredUser[]>([]);
+	const [usersLoading, setUsersLoading] = useState(true);
+	const [usersError, setUsersError] = useState<string | null>(null);
+	const [health, setHealth] = useState<HealthResponse | null>(null);
+	const [healthLoading, setHealthLoading] = useState(true);
+	const [healthError, setHealthError] = useState<string | null>(null);
+	const [updatingUserId, setUpdatingUserId] = useState<string | null>(null);
+	const [feedback, setFeedback] = useState<string | null>(null);
+	const [search, setSearch] = useState("");
 
-  useEffect(() => {
-    loadAnalytics();
-  }, [days]);
+	const loadUsers = async () => {
+		setUsersLoading(true);
+		setUsersError(null);
 
-  const loadAnalytics = async () => {
-    setLoading(true);
-    try {
-      const response = await fetch(`/api/admin/analytics?days=${days}`);
-      const data = await response.json();
-      setAnalytics(data);
-    } catch (error) {
-      console.error("Failed to load analytics:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+		try {
+			const response = await fetch("/api/admin/users", { cache: "no-store" });
+			const data = await response.json();
 
-  if (loading) {
-    return (
-      <div className="space-y-6">
-        <h1 className="text-4xl font-bold text-white">Analytics</h1>
-        <p className="text-[#999999]">Loading analytics data...</p>
-      </div>
-    );
-  }
+			if (!response.ok) {
+				throw new Error(data?.error || "Failed to load users");
+			}
 
-  if (!analytics) {
-    return (
-      <div className="space-y-6">
-        <h1 className="text-4xl font-bold text-white">Analytics</h1>
-        <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-6">
-          <p className="text-red-400">
-            Failed to load analytics. Make sure the analytics schema is set up
-            in Supabase.
-          </p>
-        </div>
-      </div>
-    );
-  }
+			setUsers(data.users || []);
+		} catch (error) {
+			console.error("Failed to fetch users:", error);
+			setUsersError("Unable to load registered users.");
+		} finally {
+			setUsersLoading(false);
+		}
+	};
 
-  const { summary, dailyStats, topPages, topReferrers, deviceBreakdown } =
-    analytics;
+	const loadHealth = async () => {
+		setHealthLoading(true);
+		setHealthError(null);
 
-  return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-4xl font-bold text-white">Analytics</h1>
-          <p className="text-[#999999] mt-2">
-            Track visitor behavior and conversions
-          </p>
-        </div>
-        <select
-          value={days}
-          onChange={(e) => setDays(parseInt(e.target.value))}
-          className="input-field w-48"
-        >
-          <option value={7}>Last 7 days</option>
-          <option value={30}>Last 30 days</option>
-          <option value={90}>Last 90 days</option>
-        </select>
-      </div>
+		try {
+			const response = await fetch("/api/admin/health", { cache: "no-store" });
+			const data = await response.json();
 
-      {/* Summary Cards */}
-      <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-[#1A1A1A] border border-[#404040] rounded-lg p-6">
-          <p className="text-[#999999] text-sm mb-1">Total Visits</p>
-          <p className="text-3xl font-bold text-white">
-            {summary.totalSessions.toLocaleString()}
-          </p>
-        </div>
+			if (!response.ok) {
+				throw new Error(data?.error || "Failed to run health checks");
+			}
 
-        <div className="bg-[#1A1A1A] border border-[#404040] rounded-lg p-6">
-          <p className="text-[#999999] text-sm mb-1">Page Views</p>
-          <p className="text-3xl font-bold text-white">
-            {summary.totalPageViews.toLocaleString()}
-          </p>
-        </div>
+			setHealth(data);
+		} catch (error) {
+			console.error("Failed to fetch health:", error);
+			setHealthError("Unable to run environment health checks.");
+		} finally {
+			setHealthLoading(false);
+		}
+	};
 
-        <div className="bg-[#1A1A1A] border border-[#404040] rounded-lg p-6">
-          <p className="text-[#999999] text-sm mb-1">Phone Clicks</p>
-          <p className="text-3xl font-bold text-primary">
-            {summary.phoneCalls.toLocaleString()}
-          </p>
-        </div>
+	useEffect(() => {
+		loadUsers();
+		loadHealth();
+	}, []);
 
-        <div className="bg-[#1A1A1A] border border-[#404040] rounded-lg p-6">
-          <p className="text-[#999999] text-sm mb-1">Form Submissions</p>
-          <p className="text-3xl font-bold text-[#4ADE80]">
-            {summary.formCompletes.toLocaleString()}
-          </p>
-          <p className="text-xs text-[#999999] mt-1">
-            {summary.conversionRate}% conversion rate
-          </p>
-        </div>
-      </div>
+	const promoteToAdmin = async (user: RegisteredUser) => {
+		setFeedback(null);
+		setUpdatingUserId(user.id);
 
-      {/* Charts Row */}
-      <div className="grid lg:grid-cols-2 gap-6">
-        {/* Top Pages */}
-        <div className="bg-[#1A1A1A] border border-[#404040] rounded-lg p-6">
-          <h2 className="text-xl font-bold text-white mb-4">Top Pages</h2>
-          <div className="space-y-3">
-            {topPages.slice(0, 8).map((page, index) => {
-              const maxViews = topPages[0]?.views || 1;
-              const percentage = (page.views / maxViews) * 100;
-              return (
-                <div key={index}>
-                  <div className="flex items-center justify-between text-sm mb-1">
-                    <span className="text-white truncate flex-1">
-                      {page.path}
-                    </span>
-                    <span className="text-[#999999] ml-2">{page.views}</span>
-                  </div>
-                  <div className="w-full bg-[#262626] rounded-full h-2">
-                    <div
-                      className="bg-primary h-2 rounded-full transition-all"
-                      style={{ width: `${percentage}%` }}
-                    />
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
+		try {
+			const response = await fetch("/api/admin/users", {
+				method: "PATCH",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ userId: user.id }),
+			});
 
-        {/* Traffic Sources */}
-        <div className="bg-[#1A1A1A] border border-[#404040] rounded-lg p-6">
-          <h2 className="text-xl font-bold text-white mb-4">Traffic Sources</h2>
-          <div className="space-y-3">
-            {topReferrers.slice(0, 8).map((referrer, index) => {
-              const maxCount = topReferrers[0]?.count || 1;
-              const percentage = (referrer.count / maxCount) * 100;
-              return (
-                <div key={index}>
-                  <div className="flex items-center justify-between text-sm mb-1">
-                    <span className="text-white truncate flex-1">
-                      {referrer.source}
-                    </span>
-                    <span className="text-[#999999] ml-2">
-                      {referrer.count}
-                    </span>
-                  </div>
-                  <div className="w-full bg-[#262626] rounded-full h-2">
-                    <div
-                      className="bg-[#4ADE80] h-2 rounded-full transition-all"
-                      style={{ width: `${percentage}%` }}
-                    />
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </div>
+			const data = await response.json();
 
-      {/* Device Breakdown & Daily Trend */}
-      <div className="grid lg:grid-cols-3 gap-6">
-        {/* Device Breakdown */}
-        <div className="bg-[#1A1A1A] border border-[#404040] rounded-lg p-6">
-          <h2 className="text-xl font-bold text-white mb-4">Devices</h2>
-          <div className="space-y-4">
-            {deviceBreakdown.map((device, index) => {
-              const total = deviceBreakdown.reduce(
-                (sum, d) => sum + d.count,
-                0,
-              );
-              const percentage = ((device.count / total) * 100).toFixed(1);
-              return (
-                <div key={index}>
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-white capitalize">{device.type}</span>
-                    <span className="text-[#999999] text-sm">
-                      {device.count} ({percentage}%)
-                    </span>
-                  </div>
-                  <div className="w-full bg-[#262626] rounded-full h-2">
-                    <div
-                      className="bg-accent h-2 rounded-full transition-all"
-                      style={{ width: `${percentage}%` }}
-                    />
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
+			if (!response.ok) {
+				throw new Error(data?.error || "Failed to update user");
+			}
 
-        {/* Recent Activity */}
-        <div className="lg:col-span-2 bg-[#1A1A1A] border border-[#404040] rounded-lg p-6">
-          <h2 className="text-xl font-bold text-white mb-4">Daily Activity</h2>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="text-left text-[#999999] border-b border-[#404040]">
-                  <th className="pb-2 pr-4">Date</th>
-                  <th className="pb-2 pr-4">Visitors</th>
-                  <th className="pb-2 pr-4">Page Views</th>
-                  <th className="pb-2 pr-4">Calls</th>
-                  <th className="pb-2">Forms</th>
-                </tr>
-              </thead>
-              <tbody>
-                {dailyStats.slice(0, 10).map((day, index) => (
-                  <tr
-                    key={index}
-                    className="border-b border-[#262626] text-white"
-                  >
-                    <td className="py-2 pr-4">
-                      {new Date(day.date).toLocaleDateString("en-US", {
-                        month: "short",
-                        day: "numeric",
-                      })}
-                    </td>
-                    <td className="py-2 pr-4">{day.unique_visitors}</td>
-                    <td className="py-2 pr-4">{day.page_views}</td>
-                    <td className="py-2 pr-4 text-primary">
-                      {day.phone_clicks}
-                    </td>
-                    <td className="py-2 text-[#4ADE80]">
-                      {day.form_completions}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
+			setFeedback(`${user.email} now has admin access.`);
+			await loadUsers();
+		} catch (error) {
+			console.error("Failed to promote user:", error);
+			setFeedback(`Could not update ${user.email}.`);
+		} finally {
+			setUpdatingUserId(null);
+		}
+	};
 
-      {/* Setup Info */}
-      <div className="bg-[#1A1A1A] border border-[#404040] rounded-lg p-6">
-        <h2 className="text-xl font-bold text-white mb-3">About Analytics</h2>
-        <div className="text-sm text-[#999999] space-y-2">
-          <p>
-            📊 <strong className="text-white">Page Views:</strong> Automatically
-            tracked for all public pages
-          </p>
-          <p>
-            📞 <strong className="text-white">Phone Clicks:</strong> Tracked
-            when users click phone numbers
-          </p>
-          <p>
-            📝 <strong className="text-white">Form Tracking:</strong> Add form
-            tracking to booking flow for funnel analysis
-          </p>
-          <p>
-            🔗 <strong className="text-white">UTM Parameters:</strong> Use
-            ?utm_source=source&utm_medium=medium&utm_campaign=campaign in your
-            marketing links
-          </p>
-        </div>
-      </div>
-    </div>
-  );
+	const filteredUsers = useMemo(() => {
+		const term = search.trim().toLowerCase();
+
+		if (!term) {
+			return users;
+		}
+
+		return users.filter((user) => {
+			const roleText = user.role || "not-admin";
+			return (
+				user.email.toLowerCase().includes(term) ||
+				user.full_name.toLowerCase().includes(term) ||
+				roleText.toLowerCase().includes(term)
+			);
+		});
+	}, [users, search]);
+
+	const envRows = health?.env || [];
+	const missingRequired = envRows.filter((item) => item.required && !item.present);
+
+	return (
+		<div className="space-y-6">
+			<div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+				<div>
+					<h1 className="text-4xl font-bold text-white">Settings</h1>
+					<p className="text-[#999999] mt-2">Manage registered users and monitor system health</p>
+				</div>
+				<div className="flex items-center gap-3">
+					<button
+						onClick={loadUsers}
+						className="px-4 py-2 rounded-md bg-[#262626] text-white border border-[#404040] hover:bg-[#303030]">
+						Refresh Users
+					</button>
+					<button
+						onClick={loadHealth}
+						className="px-4 py-2 rounded-md bg-[#262626] text-white border border-[#404040] hover:bg-[#303030]">
+						Refresh Health
+					</button>
+				</div>
+			</div>
+
+			{feedback && (
+				<div className="bg-primary/10 border border-primary/30 rounded-lg p-4">
+					<p className="text-primary text-sm">{feedback}</p>
+				</div>
+			)}
+
+			<section className="bg-[#1A1A1A] border border-[#404040] rounded-lg p-6 space-y-4">
+				<div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+					<div>
+						<h2 className="text-2xl font-bold text-white">Registered Users</h2>
+						<p className="text-[#999999] text-sm mt-1">
+							Promote registered accounts to admin access without opening Supabase
+						</p>
+					</div>
+					<input
+						type="search"
+						value={search}
+						onChange={(event) => setSearch(event.target.value)}
+						placeholder="Search by email, name, or role"
+						className="input-field w-full md:w-80"
+					/>
+				</div>
+
+				{usersLoading ? (
+					<p className="text-[#999999]">Loading users...</p>
+				) : usersError ? (
+					<div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4">
+						<p className="text-red-300 text-sm">{usersError}</p>
+					</div>
+				) : (
+					<div className="overflow-x-auto">
+						<table className="w-full text-sm min-w-[900px]">
+							<thead>
+								<tr className="text-left text-[#999999] border-b border-[#404040]">
+									<th className="pb-3 pr-4">Email</th>
+									<th className="pb-3 pr-4">Name</th>
+									<th className="pb-3 pr-4">Role</th>
+									<th className="pb-3 pr-4">Auth Status</th>
+									<th className="pb-3 pr-4">Last Sign In</th>
+									<th className="pb-3">Action</th>
+								</tr>
+							</thead>
+							<tbody>
+								{filteredUsers.map((user) => {
+									const roleLabel = user.role || "Not Admin";
+									const roleClass =
+										user.role === "owner"
+											? "bg-primary/20 text-primary"
+											: user.role === "admin"
+												? "bg-[#4ADE80]/20 text-[#4ADE80]"
+												: user.role === "dispatcher"
+													? "bg-[#F59E0B]/20 text-[#F59E0B]"
+													: "bg-[#404040] text-[#D4D4D4]";
+
+									return (
+										<tr key={user.id} className="border-b border-[#262626] text-white">
+											<td className="py-3 pr-4">{user.email}</td>
+											<td className="py-3 pr-4">{user.full_name || "-"}</td>
+											<td className="py-3 pr-4">
+												<span className={`px-2 py-1 rounded-full text-xs font-semibold ${roleClass}`}>{roleLabel}</span>
+											</td>
+											<td className="py-3 pr-4">
+												{user.email_confirmed_at ? (
+													<span className="text-[#4ADE80]">Confirmed</span>
+												) : (
+													<span className="text-[#F59E0B]">Pending</span>
+												)}
+											</td>
+											<td className="py-3 pr-4 text-[#999999]">
+												{user.last_sign_in_at ? new Date(user.last_sign_in_at).toLocaleString() : "Never"}
+											</td>
+											<td className="py-3">
+												{user.can_promote ? (
+													<button
+														onClick={() => promoteToAdmin(user)}
+														disabled={updatingUserId === user.id}
+														className="px-3 py-1.5 rounded-md bg-primary text-white disabled:opacity-60 hover:opacity-90">
+														{updatingUserId === user.id ? "Updating..." : "Set As Admin"}
+													</button>
+												) : (
+													<span className="text-[#4ADE80] text-xs font-semibold">Admin Access Enabled</span>
+												)}
+											</td>
+										</tr>
+									);
+								})}
+							</tbody>
+						</table>
+						{filteredUsers.length === 0 && <p className="text-[#999999] text-sm py-4">No matching users found.</p>}
+					</div>
+				)}
+			</section>
+
+			<section className="bg-[#1A1A1A] border border-[#404040] rounded-lg p-6 space-y-4">
+				<div>
+					<h2 className="text-2xl font-bold text-white">System Health</h2>
+					<p className="text-[#999999] text-sm mt-1">Quick environment checks to catch deployment misconfiguration</p>
+				</div>
+
+				{healthLoading ? (
+					<p className="text-[#999999]">Running health checks...</p>
+				) : healthError ? (
+					<div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4">
+						<p className="text-red-300 text-sm">{healthError}</p>
+					</div>
+				) : health ? (
+					<div className="space-y-4">
+						<div className="flex items-center gap-2">
+							<span
+								className={`inline-flex px-3 py-1 rounded-full text-xs font-semibold ${
+									health.status === "healthy" ? "bg-[#4ADE80]/20 text-[#4ADE80]" : "bg-[#F59E0B]/20 text-[#F59E0B]"
+								}`}>
+								{health.status === "healthy" ? "Healthy" : "Degraded"}
+							</span>
+							<span className="text-[#999999] text-sm">Checked {new Date(health.checked_at).toLocaleString()}</span>
+						</div>
+
+						{!health.services.database.reachable && (
+							<div className="bg-red-500/10 border border-red-500/30 rounded-lg p-3">
+								<p className="text-red-300 text-sm">
+									Database check failed: {health.services.database.error || "Unknown error"}
+								</p>
+							</div>
+						)}
+
+						{missingRequired.length > 0 && (
+							<div className="bg-red-500/10 border border-red-500/30 rounded-lg p-3">
+								<p className="text-red-300 text-sm">
+									Missing required variables: {missingRequired.map((item) => item.key).join(", ")}
+								</p>
+							</div>
+						)}
+
+						<div className="grid md:grid-cols-2 gap-3">
+							{envRows.map((item) => (
+								<div
+									key={item.key}
+									className="flex items-center justify-between bg-[#121212] border border-[#303030] rounded-md px-3 py-2">
+									<span className="text-white text-sm">{item.key}</span>
+									<span
+										className={`text-xs font-semibold ${
+											item.present ? "text-[#4ADE80]" : item.required ? "text-red-300" : "text-[#F59E0B]"
+										}`}>
+										{item.present ? "Present" : item.required ? "Missing" : "Optional"}
+									</span>
+								</div>
+							))}
+						</div>
+					</div>
+				) : null}
+			</section>
+		</div>
+	);
 }

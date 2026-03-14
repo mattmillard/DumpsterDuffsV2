@@ -8,128 +8,123 @@ import { MobileBottomNav } from "@/components/admin-mobile/MobileBottomNav";
 import { AdminUser } from "@/types/admin";
 import { getCurrentAdminUser, onAuthStateChange } from "@/lib/auth/admin";
 
-export default function AdminLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  const router = useRouter();
-  const pathname = usePathname();
-  const [user, setUser] = useState<AdminUser | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+export default function AdminLayout({ children }: { children: React.ReactNode }) {
+	const router = useRouter();
+	const pathname = usePathname();
+	const [user, setUser] = useState<AdminUser | null>(null);
+	const [loading, setLoading] = useState(true);
+	const [error, setError] = useState<string | null>(null);
 
-  // Skip auth check for login page
-  const isLoginPage = pathname === "/admin/login";
+	// Skip auth check for login page
+	const isLoginPage = pathname === "/admin/login";
 
-  useEffect(() => {
-    if (isLoginPage) {
-      setLoading(false);
-      return;
-    }
+	useEffect(() => {
+		if (isLoginPage) {
+			setLoading(false);
+			return;
+		}
 
-    async function checkAuth() {
-      try {
-        const adminUser = await getCurrentAdminUser();
+		async function checkAuth() {
+			try {
+				const adminUser = await Promise.race([
+					getCurrentAdminUser(),
+					new Promise<null>((resolve) => setTimeout(() => resolve(null), 10000)),
+				]);
 
-        if (!adminUser) {
-          router.push(`/admin/login?redirect=${encodeURIComponent(pathname)}`);
-          return;
-        }
+				if (!adminUser) {
+					router.push(`/admin/login?redirect=${encodeURIComponent(pathname)}`);
+					return;
+				}
 
-        if (adminUser) {
-          setUser(adminUser);
-        }
-      } catch (err) {
-        console.error("Auth error:", err);
-        setError("Authentication failed");
-        router.push("/admin/login");
-      } finally {
-        setLoading(false);
-      }
-    }
+				if (adminUser) {
+					setUser(adminUser);
+				}
+			} catch (err) {
+				console.error("Auth error:", err);
+				setError("Authentication failed");
+				router.push("/admin/login");
+			} finally {
+				setLoading(false);
+			}
+		}
 
-    checkAuth();
+		checkAuth();
 
-    // Listen for auth state changes
-    const subscription = onAuthStateChange((adminUser) => {
-      if (!adminUser) {
-        router.push("/admin/login");
-      } else {
-        setUser(adminUser);
-      }
-    });
+		// Listen for auth state changes
+		const subscription = onAuthStateChange((adminUser) => {
+			if (!adminUser) {
+				router.push("/admin/login");
+			} else {
+				setUser(adminUser);
+			}
+		});
 
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, [router, isLoginPage, pathname]);
+		return () => {
+			subscription.unsubscribe();
+		};
+	}, [router, isLoginPage, pathname]);
 
-  // For login page, render without auth layout
-  if (isLoginPage) {
-    return <>{children}</>;
-  }
+	// For login page, render without auth layout
+	if (isLoginPage) {
+		return <>{children}</>;
+	}
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-[#0F0F0F] flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-12 h-12 border-4 border-[#404040] border-t-primary rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-[#999999]">Loading...</p>
-        </div>
-      </div>
-    );
-  }
+	if (loading) {
+		return (
+			<div className="min-h-screen bg-[#0F0F0F] flex items-center justify-center">
+				<div className="text-center">
+					<div className="w-12 h-12 border-4 border-[#404040] border-t-primary rounded-full animate-spin mx-auto mb-4"></div>
+					<p className="text-[#999999]">Loading...</p>
+				</div>
+			</div>
+		);
+	}
 
-  if (error) {
-    return (
-      <div className="min-h-screen bg-[#0F0F0F] flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-red-400 mb-4">{error}</p>
-          <a href="/" className="text-primary hover:text-primary-light">
-            Return to homepage
-          </a>
-        </div>
-      </div>
-    );
-  }
+	if (error) {
+		return (
+			<div className="min-h-screen bg-[#0F0F0F] flex items-center justify-center">
+				<div className="text-center">
+					<p className="text-red-400 mb-4">{error}</p>
+					<a href="/" className="text-primary hover:text-primary-light">
+						Return to homepage
+					</a>
+				</div>
+			</div>
+		);
+	}
 
-  if (!user) {
-    return null;
-  }
+	if (!user) {
+		return null;
+	}
 
-  const navItems = [
-    { href: "/admin/dashboard", label: "Dashboard", icon: "📊" },
-    { href: "/admin/bookings", label: "Orders", icon: "📋" },
-    { href: "/admin/calendar", label: "Schedule", icon: "📅" },
-    { href: "/admin/inventory", label: "Inventory", icon: "📦" },
-    { href: "/admin/settings", label: "Settings", icon: "⚙️" },
-  ];
+	const navItems = [
+		{ href: "/admin/dashboard", label: "Dashboard", icon: "📊" },
+		{ href: "/admin/bookings", label: "Orders", icon: "📋" },
+		{ href: "/admin/calendar", label: "Schedule", icon: "📅" },
+		{ href: "/admin/inventory", label: "Inventory", icon: "📦" },
+		{ href: "/admin/settings", label: "Settings", icon: "⚙️" },
+	];
 
-  return (
-    <div className="min-h-screen bg-[#0F0F0F] flex flex-col md:flex-row">
-      {/* Desktop Sidebar - Hidden on mobile */}
-      <div className="hidden md:block">
-        <AdminSidebar />
-      </div>
+	return (
+		<div className="min-h-screen bg-[#0F0F0F] flex flex-col md:flex-row">
+			{/* Desktop Sidebar - Hidden on mobile */}
+			<div className="hidden md:block">
+				<AdminSidebar />
+			</div>
 
-      {/* Main content area */}
-      <div className="flex-1 flex flex-col w-full">
-        {/* Mobile Header */}
-        <MobileHeader
-          title="Operations"
-          userName={user.full_name || user.email}
-          userRole={user.role}
-        />
+			{/* Main content area */}
+			<div className="flex-1 flex flex-col w-full">
+				{/* Mobile Header */}
+				<MobileHeader title="Operations" userName={user.full_name || user.email} userRole={user.role} />
 
-        {/* Page content - with safe padding for bottom nav */}
-        <main className="flex-1 overflow-y-auto pb-24 md:pb-0">
-          <div className="p-4 md:p-8">{children}</div>
-        </main>
-      </div>
+				{/* Page content - with safe padding for bottom nav */}
+				<main className="flex-1 overflow-y-auto pb-24 md:pb-0">
+					<div className="p-4 md:p-8">{children}</div>
+				</main>
+			</div>
 
-      {/* Mobile Bottom Navigation - Hidden on desktop */}
-      <MobileBottomNav items={navItems} />
-    </div>
-  );
+			{/* Mobile Bottom Navigation - Hidden on desktop */}
+			<MobileBottomNav items={navItems} />
+		</div>
+	);
 }
