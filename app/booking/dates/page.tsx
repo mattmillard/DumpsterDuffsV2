@@ -29,6 +29,7 @@ export default function BookingDatesPage() {
   const router = useRouter();
   const [deliveryDate, setDeliveryDate] = useState("");
   const [rentalDays, setRentalDays] = useState(1);
+  const [rentalDaysInput, setRentalDaysInput] = useState("1");
   const [hasInteractedWithDateInputs, setHasInteractedWithDateInputs] =
     useState(false);
   const [sizes, setSizes] = useState<DumpsterSizeOption[]>([]);
@@ -71,7 +72,9 @@ export default function BookingDatesPage() {
         10,
       );
       if (Number.isFinite(storedRentalDays)) {
-        setRentalDays(Math.min(365, Math.max(1, storedRentalDays)));
+        const clamped = Math.min(365, Math.max(1, storedRentalDays));
+        setRentalDays(clamped);
+        setRentalDaysInput(String(clamped));
       }
 
       const minDate = getMinimumDeliveryDate(1);
@@ -264,7 +267,7 @@ export default function BookingDatesPage() {
 
             <div>
               <label className="block text-sm font-semibold text-white mb-2">
-                Rental Duration
+                Rental Duration (days)
                 <span className="text-primary ml-1">*</span>
               </label>
               <div className="flex gap-4 items-center">
@@ -272,11 +275,27 @@ export default function BookingDatesPage() {
                   type="number"
                   min="1"
                   max="365"
-                  value={rentalDays}
-                  onFocus={() => setHasInteractedWithDateInputs(true)}
+                  value={rentalDaysInput}
+                  onFocus={(e) => {
+                    setHasInteractedWithDateInputs(true);
+                    e.target.select();
+                  }}
                   onChange={(e) => {
                     setHasInteractedWithDateInputs(true);
-                    setRentalDays(Math.max(1, parseInt(e.target.value) || 0));
+                    const raw = e.target.value;
+                    setRentalDaysInput(raw);
+                    const parsed = parseInt(raw, 10);
+                    if (!isNaN(parsed) && parsed >= 1) {
+                      setRentalDays(Math.min(365, parsed));
+                    }
+                  }}
+                  onBlur={() => {
+                    const clamped = Math.min(
+                      365,
+                      Math.max(1, parseInt(rentalDaysInput, 10) || 1),
+                    );
+                    setRentalDays(clamped);
+                    setRentalDaysInput(String(clamped));
                   }}
                   className="input-field flex-1 text-center"
                 />
@@ -284,8 +303,77 @@ export default function BookingDatesPage() {
                   {rentalDays} day{rentalDays !== 1 ? "s" : ""}
                 </span>
               </div>
-              <p className="text-xs text-[#999999] mt-2">
-                Pickup Date: {new Date(pickupDate).toLocaleDateString()}
+            </div>
+
+            <div className="mb-6">
+              <label
+                htmlFor="pickup-date"
+                className="block text-sm font-semibold text-white mb-2"
+              >
+                Pickup Date
+                <span className="text-primary ml-1">*</span>
+              </label>
+              <div className="relative">
+                <input
+                  id="pickup-date"
+                  type="date"
+                  value={pickupDate}
+                  onFocus={() => setHasInteractedWithDateInputs(true)}
+                  onClick={(e) => {
+                    const input = e.currentTarget as HTMLInputElement & {
+                      showPicker?: () => void;
+                    };
+                    setHasInteractedWithDateInputs(true);
+                    input.focus();
+                    input.showPicker?.();
+                  }}
+                  onChange={(e) => {
+                    setHasInteractedWithDateInputs(true);
+                    const newPickup = e.target.value;
+                    if (deliveryDate && newPickup > deliveryDate) {
+                      const diffMs =
+                        new Date(newPickup).getTime() -
+                        new Date(deliveryDate).getTime();
+                      const diffDays = Math.round(
+                        diffMs / (1000 * 60 * 60 * 24),
+                      );
+                      const clamped = Math.min(365, Math.max(1, diffDays));
+                      setRentalDays(clamped);
+                      setRentalDaysInput(String(clamped));
+                    }
+                  }}
+                  min={
+                    deliveryDate
+                      ? calculatePickupDate(deliveryDate, 1)
+                      : undefined
+                  }
+                  max={
+                    deliveryDate
+                      ? calculatePickupDate(deliveryDate, 365)
+                      : undefined
+                  }
+                  className="input-field w-full pr-12 cursor-pointer date-input-with-icon"
+                  required
+                />
+                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-white pointer-events-none">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    className="w-5 h-5"
+                    aria-hidden="true"
+                  >
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                    <line x1="16" y1="2" x2="16" y2="6" />
+                    <line x1="8" y1="2" x2="8" y2="6" />
+                    <line x1="3" y1="10" x2="21" y2="10" />
+                  </svg>
+                </span>
+              </div>
+              <p className="text-xs text-[#999999] mt-1">
+                Calculated from delivery date + rental days
               </p>
             </div>
 
