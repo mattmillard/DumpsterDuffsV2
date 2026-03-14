@@ -87,6 +87,13 @@ export default function AdminCalendarPage() {
   const [activeTab, setActiveTab] = useState<
     "calendar" | "bookings" | "reservations" | "blacklist"
   >("calendar");
+  const [showReservationModal, setShowReservationModal] = useState(false);
+  const [reservationSize, setReservationSize] = useState(15);
+  const [reservationStartDate, setReservationStartDate] = useState("");
+  const [reservationPickupDate, setReservationPickupDate] = useState("");
+  const [reservationNotes, setReservationNotes] = useState("");
+  const [reservationSubmitting, setReservationSubmitting] = useState(false);
+  const [reservationError, setReservationError] = useState<string | null>(null);
 
   const loadCalendar = async (month: string) => {
     setLoading(true);
@@ -275,47 +282,70 @@ export default function AdminCalendarPage() {
     await loadCalendar(currentMonth);
   };
 
-  const reserveDumpster = async () => {
-    const sizeRaw = prompt("Dumpster size in yards (10, 15, 20, 30):");
-    if (!sizeRaw) return;
-
-    const sizeYards = Number(sizeRaw);
-    if (!Number.isFinite(sizeYards) || sizeYards <= 0) {
-      alert("Enter a valid dumpster size.");
-      return;
-    }
-
+  const openReservationModal = () => {
     const today = new Date().toISOString().split("T")[0];
-    const startDate = prompt("Reservation start date (YYYY-MM-DD):", today);
-    if (!startDate) return;
+    const defaultStart = selectedDate || today;
+    const defaultPickup = selectedDate || today;
+    const selectedSize = snapshot?.days
+      .flatMap((day) => day.sizes)
+      .find((size) => size.isBookable)?.size_yards;
 
-    const pickupDate = prompt(
-      "Planned pickup date (YYYY-MM-DD):",
-      selectedDate || startDate,
-    );
-    if (!pickupDate) return;
+    setReservationSize(selectedSize || 15);
+    setReservationStartDate(defaultStart);
+    setReservationPickupDate(defaultPickup);
+    setReservationNotes("");
+    setReservationError(null);
+    setShowReservationModal(true);
+  };
 
-    const notes = prompt("Notes (optional):") || "";
+  const closeReservationModal = () => {
+    if (reservationSubmitting) return;
+    setShowReservationModal(false);
+  };
 
-    const response = await fetch("/api/admin/calendar", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        action: "reserve_dumpster",
-        size_yards: sizeYards,
-        start_date: startDate,
-        pickup_date: pickupDate,
-        notes: notes.trim() || undefined,
-      }),
-    });
-
-    if (!response.ok) {
-      const payload = await response.json().catch(() => ({}));
-      alert(payload?.error || "Failed to reserve dumpster.");
+  const reserveDumpster = async () => {
+    if (!reservationStartDate || !reservationPickupDate) {
+      setReservationError("Start date and pickup date are required.");
       return;
     }
 
-    await loadCalendar(currentMonth);
+    if (reservationPickupDate < reservationStartDate) {
+      setReservationError("Pickup date must be on or after start date.");
+      return;
+    }
+
+    setReservationSubmitting(true);
+    setReservationError(null);
+
+    try {
+      const response = await fetch("/api/admin/calendar", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "reserve_dumpster",
+          size_yards: reservationSize,
+          start_date: reservationStartDate,
+          pickup_date: reservationPickupDate,
+          notes: reservationNotes.trim() || undefined,
+        }),
+      });
+
+      const payload = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        setReservationError(
+          typeof payload?.error === "string"
+            ? payload.error
+            : "Failed to reserve dumpster.",
+        );
+        return;
+      }
+
+      setShowReservationModal(false);
+      await loadCalendar(currentMonth);
+    } finally {
+      setReservationSubmitting(false);
+    }
   };
 
   const submitReservationOutcome = async (
@@ -451,7 +481,7 @@ export default function AdminCalendarPage() {
           <AdminButton variant="secondary" onClick={addToBlacklist}>
             + Blacklist Entry
           </AdminButton>
-          <AdminButton variant="primary" onClick={reserveDumpster}>
+          <AdminButton variant="primary" onClick={openReservationModal}>
             + Reserve Dumpster
           </AdminButton>
         </div>
@@ -991,6 +1021,111 @@ export default function AdminCalendarPage() {
             ))
           )}
         </div>
+      )}
+
+      {showReservationModal && (
+        <>
+          <div
+            className="fixed inset-0 bg-black/60 z-40"
+            onClick={closeReservationModal}
+          />
+
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div className="w-full max-w-lg bg-[#1A1A1A] border border-[#404040] rounded-lg shadow-2xl">
+              <div className="px-6 py-4 border-b border-[#404040]">
+                <h3 className="text-xl font-bold text-white">Reserve Dumpster</h3>
+                <p className="text-sm text-[#999999] mt-1">
+                  Block one dumpster until pickup. Availability restores after pickup confirmation.
+                </p>
+              </div>
+
+              <div className="px-6 py-4 space-y-4">
+                <div>
+                  <label className="block text-sm text-[#999999] mb-2">Dumpster Size</label>
+                  <select
+                    className="input-field w-full"
+                    value={reservationSize}
+                    onChange={(event) => setReservationSize(Number(event.target.value))}
+                    disabled={reservationSubmitting}
+                  >
+                    {Array.from(
+                      new Set(
+                        (snapshot?.days || [])
+                          .flatMap((day) => day.sizes)
+                          .map((size) => size.size_yards),
+                      ),
+                    )
+                      .sort((a, b) => a - b)
+                      .map((size) => (
+                        <option key={size} value={size}>
+                          {size} Yard
+                        </option>
+                      ))}
+                  </select>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-sm text-[#999999] mb-2">Start Date</label>
+                    <input
+                      type="date"
+                      className="input-field w-full"
+                      value={reservationStartDate}
+                      onChange={(event) => setReservationStartDate(event.target.value)}
+                      disabled={reservationSubmitting}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm text-[#999999] mb-2">Pickup Date</label>
+                    <input
+                      type="date"
+                      className="input-field w-full"
+                      value={reservationPickupDate}
+                      min={reservationStartDate || undefined}
+                      onChange={(event) => setReservationPickupDate(event.target.value)}
+                      disabled={reservationSubmitting}
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm text-[#999999] mb-2">Notes (optional)</label>
+                  <textarea
+                    className="input-field w-full min-h-[90px]"
+                    value={reservationNotes}
+                    onChange={(event) => setReservationNotes(event.target.value)}
+                    placeholder="Example: contractor hold, temp rollover, weather delay"
+                    disabled={reservationSubmitting}
+                  />
+                </div>
+
+                {reservationError && (
+                  <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-3">
+                    <p className="text-sm text-red-300">{reservationError}</p>
+                  </div>
+                )}
+              </div>
+
+              <div className="px-6 py-4 border-t border-[#404040] flex items-center justify-end gap-3">
+                <button
+                  onClick={closeReservationModal}
+                  className="px-4 py-2 rounded-md bg-[#2A2A2A] text-white hover:bg-[#3A3A3A]"
+                  disabled={reservationSubmitting}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={reserveDumpster}
+                  className="px-4 py-2 rounded-md bg-primary text-white hover:opacity-90 disabled:opacity-60"
+                  disabled={reservationSubmitting}
+                >
+                  {reservationSubmitting ? "Saving..." : "Save Reservation"}
+                </button>
+              </div>
+            </div>
+          </div>
+        </>
       )}
     </div>
   );

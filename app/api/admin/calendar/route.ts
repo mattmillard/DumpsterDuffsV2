@@ -60,6 +60,30 @@ type CalendarActionPayload =
       pickup_notes?: string;
     };
 
+function getErrorMessage(error: unknown): string {
+  if (error instanceof Error && error.message) {
+    return error.message;
+  }
+
+  if (error && typeof error === "object") {
+    const maybeError = error as { message?: unknown; details?: unknown; hint?: unknown };
+
+    if (typeof maybeError.message === "string" && maybeError.message.trim()) {
+      return maybeError.message;
+    }
+
+    if (typeof maybeError.details === "string" && maybeError.details.trim()) {
+      return maybeError.details;
+    }
+
+    if (typeof maybeError.hint === "string" && maybeError.hint.trim()) {
+      return maybeError.hint;
+    }
+  }
+
+  return "Failed to process calendar action";
+}
+
 function getMonthParam(request: Request) {
   const { searchParams } = new URL(request.url);
   const monthParam = searchParams.get("month");
@@ -175,7 +199,11 @@ export async function POST(request: Request) {
       }
 
       case "reserve_dumpster": {
-        if (!payload.size_yards || !payload.start_date || !payload.pickup_date) {
+        if (
+          !payload.size_yards ||
+          !payload.start_date ||
+          !payload.pickup_date
+        ) {
           return NextResponse.json(
             { error: "size_yards, start_date, and pickup_date are required" },
             { status: 400 },
@@ -229,10 +257,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json(
       {
-        error:
-          error instanceof Error
-            ? error.message
-            : "Failed to process calendar action",
+        error: getErrorMessage(error),
       },
       { status: 500 },
     );
