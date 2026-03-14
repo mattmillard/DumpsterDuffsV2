@@ -113,7 +113,6 @@ export async function POST(request: Request) {
       customer_name: payload.customer_full_name,
       customer_email: payload.customer_email,
       customer_phone: payload.customer_phone,
-      customer_company: payload.customer_company || null,
       size_yards: payload.size_yards,
       delivery_date: payload.delivery_date,
       total_price: payload.total,
