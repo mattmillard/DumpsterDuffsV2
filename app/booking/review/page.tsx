@@ -48,7 +48,7 @@ export default function BookingReviewPage() {
       const deliveryDate =
         sessionStorage.getItem("booking_delivery_date") || "";
       const rentalDays = parseInt(
-        sessionStorage.getItem("booking_rental_days") || "3",
+        sessionStorage.getItem("booking_rental_days") || "1",
       );
       const addressLine1 =
         sessionStorage.getItem("booking_address_line1") || "";

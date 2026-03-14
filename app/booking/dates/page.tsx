@@ -28,7 +28,7 @@ const STEPS = [
 export default function BookingDatesPage() {
   const router = useRouter();
   const [deliveryDate, setDeliveryDate] = useState("");
-  const [rentalDays, setRentalDays] = useState(3);
+  const [rentalDays, setRentalDays] = useState(1);
   const [hasInteractedWithDateInputs, setHasInteractedWithDateInputs] =
     useState(false);
   const [sizes, setSizes] = useState<DumpsterSizeOption[]>([]);
@@ -65,6 +65,14 @@ export default function BookingDatesPage() {
 
       sessionStorage.setItem("booking_size_id", validSizeId);
       setSelectedSizeId(validSizeId);
+
+      const storedRentalDays = parseInt(
+        sessionStorage.getItem("booking_rental_days") || "1",
+        10,
+      );
+      if (Number.isFinite(storedRentalDays)) {
+        setRentalDays(Math.min(365, Math.max(1, storedRentalDays)));
+      }
 
       const minDate = getMinimumDeliveryDate(1);
       setDeliveryDate(minDate);
