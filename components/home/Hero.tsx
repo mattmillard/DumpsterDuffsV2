@@ -22,7 +22,7 @@ export default async function Hero() {
                 </svg>
                 4.9★ Rating
               </span>
-              <span className="trust-badge">US Veteran Owned</span>
+              <span className="trust-badge">Veteran Owned</span>
               <span className="trust-badge">✓ Licensed & Insured</span>
               <span className="trust-badge">🚚 Junk Removal Experts</span>
             </div>
